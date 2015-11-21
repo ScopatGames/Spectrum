@@ -89,9 +89,8 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
             {
                 rotateSpeed = rotateSpeedWithInput;
                 rotateSpeedActual = rotateSpeed;
-                yInputLastUpdate = true;
             }
-
+            yInputLastUpdate = true;
             //Calculate angle due to player input
             float inputAngle = controlDirection*inputVector.y * Mathf.Abs(inputVector.y) * rotationInputSensitivity;
 
@@ -104,9 +103,8 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
             {
                 rotateSpeedActual = 1f;
                 rotateSpeed = rotateSpeedNoInput;
-                yInputLastUpdate = false;
             }
-
+            yInputLastUpdate = false;
             //New simple method:
             thrustVector = transform.right * thrustForce;
 
