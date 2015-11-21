@@ -1,3 +1,0 @@
-# Spectrum
-
-Prototype mobile game.
