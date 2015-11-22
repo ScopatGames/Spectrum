@@ -1,27 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Text;
+using System.Collections.Generic;
+
 
 public class TerrainGenerator : MonoBehaviour {
-    public Vector3 terrainOffset = new Vector3(0, 0, 0);
-    public Vector3[] terrainVertices;
-    public int[] terrainTriangles;
-    public GameObject terrainTile;
     public TextAsset verticesTextFile;
     public TextAsset trianglesTextFile;
+    public Vector3 terrainOffset = new Vector3(0, 0, 0);
+    public GameObject terrainTile;
 
+    private List<Vector3> terrainVertices = new List<Vector3>();
+    private List<int> terrainTriangles = new List<int>();
     private int numTiles = 0;
     	
 	void Start () {
-        string[] verticesParsed = verticesTextFile.text.Split('\n');
-       string[] trianglesParsed = trianglesTextFile.text.Split('\n');
-
-
-        
-        
-        //Determine number of tiles
-        if (terrainTriangles.Length % 3 == 0)
+        //Parse terrain vertex data
+        string[] fileRows = verticesTextFile.text.Split('\n');
+        for (int i = 0; i < (fileRows.Length-1); i++)
         {
-            numTiles = terrainTriangles.Length / 3;
+            string[] values = fileRows[i].Split(',');
+            terrainVertices.Add(new Vector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2])));
+        }
+        //Parse triangle data
+        fileRows = trianglesTextFile.text.Split('\n');
+        for (int i = 0; i < (fileRows.Length-1); i++)
+        {
+            terrainTriangles.Add(int.Parse(fileRows[i]));
+        }
+
+        //Determine number of tiles
+        if (terrainTriangles.Count % 3 == 0)
+        {
+            numTiles = terrainTriangles.Count / 3;
         }
         else
         {
@@ -45,9 +56,15 @@ public class TerrainGenerator : MonoBehaviour {
                 tileVertices[j] -= tilePosition;
             }
 
-            float tileInset = 0.0f; // TODO add some logic to this
+            float tileInset = Random.Range(0.4f, 0.8f);
+            if(Random.Range(0f, 1f) < 0.5f)
+            {
+                tileInset *= -1f;
+            }
+            float tileInsetBorder = Random.Range(0.4f, 0.8f);
             GameObject newTile = Instantiate(terrainTile, tilePosition+terrainOffset, Quaternion.identity) as GameObject;
-            newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileInset);
+            newTile.transform.parent = transform;
+            newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileInset, tileInsetBorder);
         }
 
 

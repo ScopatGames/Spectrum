@@ -26,7 +26,7 @@ public class GetMeshData : MonoBehaviour {
             }
             output.Append("\n");
         }
-        File.WriteAllText(@"K:\Projects\Spectrum\MeshData\meshData.dat", output.ToString());
+        File.WriteAllText(@"K:\Projects\Spectrum\MeshData\meshData.txt", output.ToString());
     }
 
     void GetTriangles()
@@ -49,12 +49,18 @@ public class GetMeshData : MonoBehaviour {
 
         int lowerLeftVertexIndex = 1;
         int upperLeftVertexIndex = 6;
+        
 
         triangleIndex = 15;
 
         //loop by strake
         for(int strakeIndex = 1; strakeIndex < numberStrakes; strakeIndex++)
         {
+            int lastTriangleIndex = triangleIndex + ((strakeIndex*2+1)*5 - 1)*3;
+            int secondToLastTriangleIndex = lastTriangleIndex - 3;
+            int startingLowerLeft = lowerLeftVertexIndex;
+            int startingUpperLeft = upperLeftVertexIndex;
+
             //loop by section
             for(int sectionIndex = 0; sectionIndex < numberSections; sectionIndex++)
             {
@@ -62,16 +68,36 @@ public class GetMeshData : MonoBehaviour {
                 for(int j = 0; j<(strakeIndex + 1); j++)
                 {
                     //assign left triangle of "quad"
-                    triangles[triangleIndex] = lowerLeftVertexIndex+j;
-                    triangles[triangleIndex + 1] = upperLeftVertexIndex+j;
-                    triangles[triangleIndex + 2] = upperLeftVertexIndex + j + 1;
+                    //Test if this is the last strake triangle...
+                    if (triangleIndex == lastTriangleIndex)
+                    {
+                        triangles[triangleIndex] = startingLowerLeft;
+                        triangles[triangleIndex + 1] = upperLeftVertexIndex + j;
+                        triangles[triangleIndex + 2] = startingUpperLeft;
+                    }
+                    else
+                    {
+                        triangles[triangleIndex] = lowerLeftVertexIndex + j;
+                        triangles[triangleIndex + 1] = upperLeftVertexIndex + j;
+                        triangles[triangleIndex + 2] = upperLeftVertexIndex + j + 1;
+                    }
                     if(j != strakeIndex)
                     {
                         //assign right triangle of "quad"
                         triangleIndex += 3;
-                        triangles[triangleIndex] = lowerLeftVertexIndex + j;
-                        triangles[triangleIndex + 1] = upperLeftVertexIndex + j + 1;
-                        triangles[triangleIndex + 2] = lowerLeftVertexIndex + j + 1;
+                        //Test if this is the second to last strake triangle...
+                        if (triangleIndex == secondToLastTriangleIndex)
+                        {
+                            triangles[triangleIndex] = lowerLeftVertexIndex + j;
+                            triangles[triangleIndex + 1] = upperLeftVertexIndex + j + 1;
+                            triangles[triangleIndex + 2] = startingLowerLeft;
+                        }
+                        else
+                        {
+                            triangles[triangleIndex] = lowerLeftVertexIndex + j;
+                            triangles[triangleIndex + 1] = upperLeftVertexIndex + j + 1;
+                            triangles[triangleIndex + 2] = lowerLeftVertexIndex + j + 1;
+                        }
                     }
                     triangleIndex += 3;
                 }
@@ -84,7 +110,7 @@ public class GetMeshData : MonoBehaviour {
         {
             output.Append(triangles[k] + "\n");
         }
-        File.WriteAllText(@"K:\Projects\Spectrum\MeshData\trianglesData.dat", output.ToString());
+        File.WriteAllText(@"K:\Projects\Spectrum\MeshData\trianglesData.txt", output.ToString());
     }
 
 
