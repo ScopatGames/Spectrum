@@ -159,7 +159,7 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
     {
         if(CrossPlatformInputManager.GetButtonDown("Next"))
         {
-             Application.LoadLevel(0);
+             Application.LoadLevel(2);
         }
 
         //Check to see if the player is flying upside-down on joystick button release

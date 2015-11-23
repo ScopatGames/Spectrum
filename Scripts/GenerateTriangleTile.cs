@@ -7,47 +7,35 @@ public class GenerateTriangleTile : MonoBehaviour {
     private List<int> tileTriangles = new List<int>();
     private List<Vector3> tileVerticesList = new List<Vector3>();
     private Vector3 newVertex;
+    private PolygonCollider2D polygonCollider2D;
     //private Vector2[] tileUVs;
     
-    public void GenerateMesh(Vector3[] tileVertices, float tileInset, float tileInsetBorder)
+    public void GenerateMesh(Vector3[] tileVertices, float tileDepth)
     {
+        //Configure PolygonCollider2D
+        polygonCollider2D = GetComponent<PolygonCollider2D>();
+        Vector2[] polygonColliderVertices = new Vector2[3];
+        for(int i =0; i < 3; i++)
+        {
+            polygonColliderVertices[i] = new Vector2(tileVertices[i].x, tileVertices[i].y);
+        }
+        polygonCollider2D.SetPath(0, polygonColliderVertices);
+
+
         //If tile has an inset, calculate the new inset vertices
-        if(tileInset != 0.0f && Mathf.Abs(tileInsetBorder) > 0.0f && Mathf.Abs(tileInsetBorder) < 1.0f)
+        if (tileDepth != 0.0f)
         {
             //Create vertex list
-            tileVerticesList.Add(tileVertices[0] * tileInsetBorder + new Vector3(0,0,tileInset));    //0
-            tileVerticesList.Add(tileVertices[1] * tileInsetBorder + new Vector3(0, 0, tileInset));    //1
-            tileVerticesList.Add(tileVertices[2] * tileInsetBorder + new Vector3(0, 0, tileInset));    //2
-            tileVerticesList.Add(tileVertices[0]);                      //3
-            tileVerticesList.Add(tileVertices[1]);                      //4
-            tileVerticesList.Add(tileVerticesList[1]);                  //5
-            tileVerticesList.Add(tileVerticesList[0]);                  //6
-            tileVerticesList.Add(tileVertices[1]);                      //7
-            tileVerticesList.Add(tileVertices[2]);                      //8
-            tileVerticesList.Add(tileVerticesList[2]);                  //9
-            tileVerticesList.Add(tileVerticesList[1]);                  //10
-            tileVerticesList.Add(tileVertices[2]);                      //11
-            tileVerticesList.Add(tileVertices[0]);                      //12
-            tileVerticesList.Add(tileVerticesList[0]);                  //13
-            tileVerticesList.Add(tileVerticesList[2]);                  //14
-
+            tileVerticesList.Add(tileVertices[0]);                   // Vertex 0
+            tileVerticesList.Add(new Vector3(0, 0, tileDepth));     // Vertex 1
+            tileVerticesList.Add(tileVertices[2]);                  // Vertex 2
+            tileVerticesList.Add(tileVertices[0]);                  // Vertex 3
+            tileVerticesList.Add(tileVertices[1]);                  // Vertex 4
+            tileVerticesList.Add(tileVerticesList[1]);              // Vertex 5
+            tileVerticesList.Add(tileVertices[1]);                  // Vertex 6
+            tileVerticesList.Add(tileVertices[2]);                  // Vertex 7
+            tileVerticesList.Add(tileVerticesList[1]);              // Vertex 8
             
-            
-
-            /*for (int i = 0; i < tileVertices.Length; i++)
-            {
-                tileVerticesList.Add(tileVertices[i]);
-            }
-            
-            //Calculate three new vertices
-            for (int i = 0; i < ; i++)
-            {
-                newVertex = tileVertices[i] * tileInsetBorder;
-                newVertex.z = tileInset;
-                tileVerticesList.Add(newVertex);
-            }
-            */
-
             tileVertices = tileVerticesList.ToArray();
 
             /*tileUVs = new Vector2[6];
@@ -66,28 +54,11 @@ public class GenerateTriangleTile : MonoBehaviour {
 
             tileTriangles.Add(3);
             tileTriangles.Add(4);
-            tileTriangles.Add(6);
-
-            tileTriangles.Add(6);
-            tileTriangles.Add(4);
             tileTriangles.Add(5);
 
+            tileTriangles.Add(6);
             tileTriangles.Add(7);
             tileTriangles.Add(8);
-            tileTriangles.Add(10);
-
-            tileTriangles.Add(10);
-            tileTriangles.Add(8);
-            tileTriangles.Add(9);
-
-            tileTriangles.Add(11);
-            tileTriangles.Add(12);
-            tileTriangles.Add(14);
-
-            tileTriangles.Add(14);
-            tileTriangles.Add(12);
-            tileTriangles.Add(13);
-
         }
         else
         {
@@ -110,8 +81,11 @@ public class GenerateTriangleTile : MonoBehaviour {
         mesh.triangles = tileTriangles.ToArray();
         //mesh.uv = tileUVs;
         mesh.RecalculateNormals();
+
         
-   }
+
+
+    }
 
     
 	

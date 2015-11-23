@@ -8,6 +8,7 @@ public class TerrainGenerator : MonoBehaviour {
     public TextAsset verticesTextFile;
     public TextAsset trianglesTextFile;
     public Vector3 terrainOffset = new Vector3(0, 0, 0);
+    public float terrainScale = 1f;
     public GameObject terrainTile;
 
     private List<Vector3> terrainVertices = new List<Vector3>();
@@ -20,7 +21,7 @@ public class TerrainGenerator : MonoBehaviour {
         for (int i = 0; i < (fileRows.Length-1); i++)
         {
             string[] values = fileRows[i].Split(',');
-            terrainVertices.Add(new Vector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2])));
+            terrainVertices.Add(new Vector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2]))*terrainScale);
         }
         //Parse triangle data
         fileRows = trianglesTextFile.text.Split('\n');
@@ -56,15 +57,15 @@ public class TerrainGenerator : MonoBehaviour {
                 tileVertices[j] -= tilePosition;
             }
 
-            float tileInset = Random.Range(0.4f, 0.8f);
+            float tileDepth = Random.Range(0.4f, 0.8f);
             if(Random.Range(0f, 1f) < 0.5f)
             {
-                tileInset *= -1f;
+                tileDepth *= -1f;
             }
-            float tileInsetBorder = Random.Range(0.4f, 0.8f);
+            
             GameObject newTile = Instantiate(terrainTile, tilePosition+terrainOffset, Quaternion.identity) as GameObject;
             newTile.transform.parent = transform;
-            newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileInset, tileInsetBorder);
+            newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileDepth);
         }
 
 
