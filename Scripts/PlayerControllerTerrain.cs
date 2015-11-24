@@ -4,7 +4,9 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerControllerTerrain : MonoBehaviour {
     public float thrustForce = 5;
-    public float jumpForce = 5;
+    public float jumpForce = 5000;
+    public float jumpRechargeTime = 0.2f;
+    public float jumpDuration = 2;
     public float maxVelocity = 10;
     public float boundaryRadius = 40;
     public float rotateSpeed = 10;
@@ -15,12 +17,16 @@ public class PlayerControllerTerrain : MonoBehaviour {
     public Transform childPivotTransform;
     public float pivotSpeed = 3f;
     public bool lookingRight = true;
+    public LayerMask environmentLayerMask;
 
     private float minX = 0.3f;
-    private float minY = 0.15f;
+    private float minY = 0.5f;
     private bool xInput;
-    private bool yInput;
     private float targetAngleZ;
+    private float jumpTimer;
+    public bool playerGrounded = false;
+    public bool playerJumping = false;
+    private float jumpDurationTimer = 0f;
     private Vector3 jumpVector;
     private Vector3 gravityVector;
     private Vector3 thrustVector;
@@ -45,7 +51,7 @@ public class PlayerControllerTerrain : MonoBehaviour {
         Vector3 inputVector = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f);
         //Test for input threshold:
         xInput = (Mathf.Abs(inputVector.x) > minX) ? true : false;
-        yInput = (Mathf.Abs(inputVector.y) > minY) ? true : false;
+        
         thrustVector = Vector3.zero;
         targetAngleZ = 0f;
         jumpVector = Vector3.zero;
@@ -59,15 +65,49 @@ public class PlayerControllerTerrain : MonoBehaviour {
             
         }
 
-        if (yInput)
+        //Test to see if the player is on the ground before jumping
+        RaycastHit2D hit2D = Physics2D.Raycast(transform.position, -transform.up, 1.0f, environmentLayerMask);
+        
+        if(hit2D.collider != null)
         {
-            if (inputVector.y > 0)
+            jumpTimer += Time.fixedDeltaTime;
+            if(jumpTimer > jumpRechargeTime && !playerJumping)
             {
-                jumpVector = transform.up * inputVector.y*Mathf.Abs(inputVector.y)*jumpForce;
+                playerGrounded = true;
+                jumpDurationTimer = 0f;
             }
         }
+        else
+        {
+            jumpTimer = 0f;
+        }
+
+        if (inputVector.y > minY)
+        {
+            if (playerGrounded)
+            {
+                jumpVector = (transform.up+ 0.25f*transform.right * inputVector.x) *jumpForce;
+                playerGrounded = false;
+                playerJumping = true;
+            }
+            else if (playerJumping && jumpDurationTimer < jumpDuration)
+            {
+                jumpDurationTimer += Time.fixedDeltaTime;
+                jumpVector = (transform.up+ 0.25f*transform.right*inputVector.x) * (jumpForce / (jumpDuration * jumpDuration))*(jumpDurationTimer - jumpDuration)*(jumpDurationTimer - jumpDuration);
+            }
+            else
+            {
+                playerJumping = false;
+            }
+            
+        }
+        
 
         gravityVector = transform.position * -3f * rigidBody2D.mass;
+        if(jumpVector.sqrMagnitude < gravityVector.sqrMagnitude)
+        {
+            jumpVector = Vector3.zero;
+        }
         rigidBody2D.AddForce(thrustVector + gravityVector + jumpVector);
 
         //Correct angle for camera rotation only

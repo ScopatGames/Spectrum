@@ -14,6 +14,7 @@ public class TerrainGenerator : MonoBehaviour {
     private List<Vector3> terrainVertices = new List<Vector3>();
     private List<int> terrainTriangles = new List<int>();
     private int numTiles = 0;
+    private bool skipTile = false;
     	
 	void Start () {
         //Parse terrain vertex data
@@ -43,29 +44,39 @@ public class TerrainGenerator : MonoBehaviour {
         //Instantiate tiles
         for(int i = 0; i < numTiles; i++)
         {
-            Vector3[] tileVertices = new Vector3[3];
-            
-            //Find global tile vertex coordinates
-            for (int j = 0; j<3; j++)
+            if (i > 845 && Random.Range(0.0f, 1.0f) < .33f) //This give a 67% chance that the outer tiles will be filled
             {
-                tileVertices[j] = terrainVertices[terrainTriangles[i*3 + j]];
+                skipTile = true;
             }
-            Vector3 tilePosition = CalculateTriangleCentroid(tileVertices[0], tileVertices[1], tileVertices[2]);
-            //Transform tileVertices to local coordinates relative to tile position
-            for (int j = 0; j<3; j++)
+            else
             {
-                tileVertices[j] -= tilePosition;
+                skipTile = false;
             }
+            if (!skipTile) { 
+                Vector3[] tileVertices = new Vector3[3];
 
-            float tileDepth = Random.Range(0.4f, 0.8f);
-            if(Random.Range(0f, 1f) < 0.5f)
-            {
-                tileDepth *= -1f;
+                //Find global tile vertex coordinates
+                for (int j = 0; j < 3; j++)
+                {
+                    tileVertices[j] = terrainVertices[terrainTriangles[i * 3 + j]];
+                }
+                Vector3 tilePosition = CalculateTriangleCentroid(tileVertices[0], tileVertices[1], tileVertices[2]);
+                //Transform tileVertices to local coordinates relative to tile position
+                for (int j = 0; j < 3; j++)
+                {
+                    tileVertices[j] -= tilePosition;
+                }
+
+                float tileDepth = Random.Range(0.4f, 0.8f);
+                if (Random.Range(0f, 1f) < 0.5f)
+                {
+                    tileDepth *= -1f;
+                }
+
+                GameObject newTile = Instantiate(terrainTile, tilePosition + terrainOffset, Quaternion.identity) as GameObject;
+                newTile.transform.parent = transform;
+                newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileDepth);
             }
-            
-            GameObject newTile = Instantiate(terrainTile, tilePosition+terrainOffset, Quaternion.identity) as GameObject;
-            newTile.transform.parent = transform;
-            newTile.GetComponent<GenerateTriangleTile>().GenerateMesh(tileVertices, tileDepth);
         }
 
 
