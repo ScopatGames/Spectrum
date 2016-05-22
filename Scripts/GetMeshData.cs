@@ -26,7 +26,9 @@ public class GetMeshData : MonoBehaviour {
             }
             output.Append("\n");
         }
+#if UNITY_STANDALONE
         File.WriteAllText(@"K:\Projects\Spectrum\MeshData\meshData.txt", output.ToString());
+#endif
     }
 
     void GetTriangles()
@@ -110,8 +112,10 @@ public class GetMeshData : MonoBehaviour {
         {
             output.Append(triangles[k] + "\n");
         }
+#if UNITY_STANDALONE
         File.WriteAllText(@"K:\Projects\Spectrum\MeshData\trianglesData.txt", output.ToString());
-    }
+#endif    
+      }
 
 
 }

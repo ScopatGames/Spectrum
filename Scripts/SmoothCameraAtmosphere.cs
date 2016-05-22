@@ -5,9 +5,9 @@ public class SmoothCameraAtmosphere : MonoBehaviour {
     public float lagTime = 12f;
     public Transform player;
     public float rotateSpeed = 10;
-
-    public float upperBoundary = 110;
-    public float lowerBoundary = 100;
+    public float radialOffset = 8;
+    public float upperBoundary = 75;
+    public float lowerBoundary = 25;
     // [Header("Enter the half width and height of level in world units")]
     // public Vector2 levelExtents;
 
@@ -29,7 +29,7 @@ public class SmoothCameraAtmosphere : MonoBehaviour {
         if (player)
         {
             Vector3 from = transform.position;
-            Vector3 to = player.position;
+            Vector3 to = player.position.normalized*(player.position.magnitude-radialOffset);
             to.z = transform.position.z;
             transform.position -= (from - to) * lagTime * Time.deltaTime;
 

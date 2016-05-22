@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class PickupCounter : MonoBehaviour {
@@ -14,7 +15,8 @@ public class PickupCounter : MonoBehaviour {
 
         if(counter == targetNumber)
         {
-            Application.LoadLevel(levelToLoad);
+            SceneManager.LoadScene(levelToLoad);
+            //Application.LoadLevel(levelToLoad);
         }
     }
 

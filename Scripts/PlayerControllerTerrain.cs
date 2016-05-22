@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerControllerTerrain : MonoBehaviour {
@@ -164,7 +164,8 @@ public class PlayerControllerTerrain : MonoBehaviour {
 
         if (CrossPlatformInputManager.GetButtonDown("Next"))
         {
-            Application.LoadLevel(0);
+            SceneManager.LoadScene(0);
+            //Application.LoadLevel(0);
         }
         if (CrossPlatformInputManager.GetAxis("Horizontal") > 0f)
         {

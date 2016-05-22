@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.SceneManagement;
 
 public class PlayerControllerAtmosphere : MonoBehaviour {
     public float thrustForce = 100;
@@ -159,7 +159,8 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
     {
         if(CrossPlatformInputManager.GetButtonDown("Next"))
         {
-             Application.LoadLevel(2);
+            SceneManager.LoadScene(2); 
+            //Application.LoadLevel(2);
         }
 
         //Check to see if the player is flying upside-down on joystick button release

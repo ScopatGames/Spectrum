@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerControllerSpace : MonoBehaviour {
@@ -67,7 +67,8 @@ public class PlayerControllerSpace : MonoBehaviour {
         
         if(CrossPlatformInputManager.GetButtonDown("Next"))
         {
-            Application.LoadLevel(1);
+            SceneManager.LoadScene(1);
+            //Application.LoadLevel(1);
         }
     }
 }
