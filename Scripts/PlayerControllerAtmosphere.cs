@@ -41,7 +41,6 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
     void Start()
     {
         rigidBody2D = this.GetComponent<Rigidbody2D>();
-        CrossPlatformInputManager.SetButtonUp("Next");
         rotateSpeedActual = rotateSpeedNoInput;
     }
 
@@ -157,12 +156,6 @@ public class PlayerControllerAtmosphere : MonoBehaviour {
 
     void Update()
     {
-        if(CrossPlatformInputManager.GetButtonDown("Next"))
-        {
-            SceneManager.LoadScene(2); 
-            //Application.LoadLevel(2);
-        }
-
         //Check to see if the player is flying upside-down on joystick button release
         if (CrossPlatformInputManager.GetButtonUp("JoystickButton"))
         {

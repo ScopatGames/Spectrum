@@ -18,8 +18,8 @@ public class PlayerControllerSpace : MonoBehaviour {
 
     Rigidbody2D rigidBody2D;
 	void Start () {
-        rigidBody2D = this.GetComponent<Rigidbody2D>();
-        CrossPlatformInputManager.SetButtonUp("Next");
+        rigidBody2D = GetComponent<Rigidbody2D>();
+        
     }
 
     void FixedUpdate()
@@ -61,14 +61,5 @@ public class PlayerControllerSpace : MonoBehaviour {
             barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
         }
     }
-
-    void Update()
-    {
-        
-        if(CrossPlatformInputManager.GetButtonDown("Next"))
-        {
-            SceneManager.LoadScene(1);
-            //Application.LoadLevel(1);
-        }
-    }
+     
 }
