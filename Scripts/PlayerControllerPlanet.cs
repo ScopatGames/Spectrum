@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.SceneManagement;
 
 public class PlayerControllerPlanet : MonoBehaviour
 {
     public float thrustForce = 100;
     public float addedThrustForce = 50;
     public float maxVelocity = 100;
-    public float outerBoundaryRadius = 80;
+    public float outerBoundaryRadius = 120;
+    public float innerBoundaryRadius = 80;
     public float rotateSpeedNoInput = 500;
     public float rotateSpeedWithInput = 10;
     public float rollSpeed = 3;
@@ -15,7 +17,6 @@ public class PlayerControllerPlanet : MonoBehaviour
     public float moveCounterReset = 0.3f;
     public GameObject barrierIndicator;
     public Transform childRollTransform;
-    public float rotateSpeed = 10f;
 
     private Renderer barrierRenderer;
     private Color barrierColor;
@@ -25,40 +26,119 @@ public class PlayerControllerPlanet : MonoBehaviour
     private bool yInput;
     private bool flyingClockwise;
     private Vector3 gravityVector;
-    private float targetAngle = 0;
+    private float targetAngleZ;
     private int rollCount = 0;
     private Quaternion childRotationTarget;
     private float controlDirection = -1f;
+    private float rotateSpeed;
+    public float rotateSpeedActual;
     private bool yInputLastUpdate;
     private Vector3 directionVector;
+
+
+
 
     Rigidbody2D rigidBody2D;
     void Start()
     {
-        rigidBody2D = GetComponent<Rigidbody2D>();
+        rigidBody2D = this.GetComponent<Rigidbody2D>();
+        rotateSpeedActual = rotateSpeedNoInput;
     }
 
     void FixedUpdate()
     {
-        Vector3 inputVector = Vector3.ClampMagnitude(new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f), 1.0f);
-
-        if (inputVector.sqrMagnitude > 0.01)
+        //This dampens the rotation when the joystick is released
+        if (rotateSpeedActual < rotateSpeed)
         {
-            if (rigidBody2D.velocity.sqrMagnitude < maxVelocity * maxVelocity)
-            {
-                rigidBody2D.AddForce(transform.right * thrustForce * inputVector.sqrMagnitude);
-            }
-            else
-            {
-                Debug.Log("already at max velocity");
-            }
-            targetAngle = Mathf.Rad2Deg * Mathf.Atan2(-inputVector.x, inputVector.y);
+
+            rotateSpeedActual = (rotateSpeedActual * 1.1f > rotateSpeed) ? rotateSpeed : rotateSpeedActual * 1.1f;
+
         }
 
+        //Determine the current direction of flight
+        flyingClockwise = (Vector3.Cross(transform.position, transform.right).z < 0) ? true : false;
+
+        //Get player inputs
+        Vector3 inputVector = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f);
+        //Test for input threshold:
+        xInput = (Mathf.Abs(inputVector.x) > minX) ? true : false;
+        yInput = (Mathf.Abs(inputVector.y) > minY) ? true : false;
+        //Reset thrust vectors:
+        Vector3 thrustVector = Vector3.zero;
+        Vector3 addedThrustVector = Vector3.zero;
+        Vector3 xThrust = Vector3.zero;
+        Vector3 yThrust = Vector3.zero;
+
+        if (xInput)
+        {
+            xThrust = inputVector.x * transform.right;
+        }
+
+        if(yInput)
+        {
+            yThrust = inputVector.y * transform.up;
+        }
+
+
+        /*
+        //Thrust input
+        if (xInput)
+        {
+            //Calculate addedThrustVector here...
+            addedThrustVector = transform.right * inputVector.x * Mathf.Abs(inputVector.x) * addedThrustForce;
+            if (!flyingClockwise)
+            {
+                addedThrustVector = -1 * addedThrustVector;
+            }
+        }
+
+        //Rotation input
+        if (yInput)
+        {
+            //New, simple method:
+            thrustVector = transform.right * thrustForce;
+            if (!yInputLastUpdate)
+            {
+                rotateSpeed = rotateSpeedWithInput;
+                rotateSpeedActual = rotateSpeed;
+            }
+            yInputLastUpdate = true;
+            //Calculate angle due to player input
+            float inputAngle = controlDirection * inputVector.y * Mathf.Abs(inputVector.y) * rotationInputSensitivity;
+
+            //Factor in component due to pitch
+            targetAngleZ = transform.rotation.eulerAngles.z + inputAngle;
+        }
+        else
+        {
+            if (yInputLastUpdate)
+            {
+                rotateSpeedActual = 1f;
+                rotateSpeed = rotateSpeedNoInput;
+            }
+            yInputLastUpdate = false;
+            //New simple method:
+            thrustVector = transform.right * thrustForce;
+
+            //Correct angle for camera rotation only
+            directionVector = Vector3.Cross(transform.position, new Vector3(0, 0, 1)).normalized;
+            if (!flyingClockwise)
+            {
+                directionVector = -1 * directionVector;
+            }
+            targetAngleZ = Mathf.Rad2Deg * Mathf.Atan2(directionVector.y, directionVector.x);
+        }
+        */
+
         //Update player rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngleZ), rotateSpeedActual * Time.deltaTime);
         //Update roll rotation
         childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
+
+        //add constant forward force plus additional forces
+        gravityVector = transform.position * -.05f * rigidBody2D.mass;
+        //rigidBody2D.AddForce(thrustVector + addedThrustVector + gravityVector);
+        rigidBody2D.AddForce(xThrust + yThrust + gravityVector);
 
         ///////////BOUNDARY CONTROL/////////////
         //Check to see if player is within playable boundary and update if necessary:
@@ -72,6 +152,16 @@ public class PlayerControllerPlanet : MonoBehaviour
             //Move Barrier Indicator
             barrierIndicator.transform.position = transform.position;
             barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicator.transform.position.x, barrierIndicator.transform.position.y));
+        }
+        else if (transform.position.sqrMagnitude < innerBoundaryRadius * innerBoundaryRadius)
+        {
+            newPos = transform.position.normalized * innerBoundaryRadius;
+            newPos.z = 0f;
+            transform.position = newPos;
+
+            //Move Barrier Indicator
+            barrierIndicator.transform.position = transform.position;
+            barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicator.transform.position.x, barrierIndicator.transform.position.y) + 180);
         }
         else
         {
