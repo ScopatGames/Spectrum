@@ -16,7 +16,6 @@ public class PickupCounter : MonoBehaviour {
         if(counter == targetNumber)
         {
             SceneManager.LoadScene(levelToLoad);
-            //Application.LoadLevel(levelToLoad);
         }
     }
 

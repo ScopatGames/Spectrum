@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GenerateTriangleTile : MonoBehaviour {
+    //CLASS IS OBSOLETE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     //This class generates mesh and collider geometry for each tile gameobject.
     private List<int> tileTriangles = new List<int>();
     private List<Vector3> tileVerticesList = new List<Vector3>();

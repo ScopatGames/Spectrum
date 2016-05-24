@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 
 public class TerrainGenerator : MonoBehaviour {
+    //CLASS IS OBSOLETE<<<<<<<<<<<<<<<<<<<<<<<
     public TextAsset verticesTextFile;
     public TextAsset trianglesTextFile;
     public Vector3 terrainOffset = new Vector3(0, 0, 0);

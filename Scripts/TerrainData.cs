@@ -101,8 +101,8 @@ public class TerrainData : MonoBehaviour {
         string[] fileRows = baselineVertices.text.Split('\n');
         for (int i = 0; i < (fileRows.Length - 1); i++)
         {
-            randomScaleFactorOne = Random.Range(1.0f, 1.05f);
-            randomScaleFactorTwo = Random.Range(1.0f, 1.05f);
+            randomScaleFactorOne = Random.Range(1.0f, 1.1f);
+            randomScaleFactorTwo = Random.Range(1.0f, 1.1f);
             values = fileRows[i].Split(',');
             value0 = float.Parse(values[0]);
             value1 = float.Parse(values[1]);
