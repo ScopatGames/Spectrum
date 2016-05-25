@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerControllerPlanet : MonoBehaviour
@@ -12,22 +11,19 @@ public class PlayerControllerPlanet : MonoBehaviour
     public GameObject barrierIndicator;
     public Transform childRollTransform;
 
-    private float minX = 0.5f;
-    private float minY = 0.15f;
-    private bool xInput;
-    private bool yInput;
+    private bool input;
     private bool flyingClockwise = true;
     private bool flyingClockwiseLastFrame = true;
-    private float targetAngleZ;
+    private float inputAngle;
+    private float targetAngle;
     private bool rollIsAvailable = true;
     private int rollCount = 0;
     private Quaternion childRotationTarget;
     private Vector3 inputVector;
-    private Vector3 thrustVector;
-    private Vector3 xThrust;
-    private Vector3 yThrust;
+    private float thrustFactor;
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
+
 
     void Start()
     {
@@ -39,60 +35,54 @@ public class PlayerControllerPlanet : MonoBehaviour
 
     void FixedUpdate()
     {
-        
         //Get player inputs
         inputVector = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f);
         //Test for input threshold:
-        xInput = (Mathf.Abs(inputVector.x) > minX) ? true : false;
-        yInput = (Mathf.Abs(inputVector.y) > minY) ? true : false;
-        //Reset thrust vectors:
-        thrustVector = Vector3.zero;
-        xThrust = Vector3.zero;
-        yThrust = Vector3.zero;
+        input = (inputVector.sqrMagnitude > 0.01) ? true : false;
 
         //Determine the current direction of flight
         flyingClockwiseLastFrame = flyingClockwise;
         flyingClockwise = (Vector3.Cross(transform.position, transform.right).z < 0) ? true : false;
 
-        if (xInput)
+        if (input)
         {
-            xThrust = Math.Abs(inputVector.x) * transform.right;
+            //If user is supplying input, calculate thrust factor
+            thrustFactor = (inputVector.sqrMagnitude + defaultThrustFactor)*addedThrustForce;
+            
+            //Calculate the user input angle
+            inputAngle = Mathf.Rad2Deg * Mathf.Atan2(inputVector.y, inputVector.x);
+        }
+        else
+        {   
+            //Use default thrust factor if no input
+            thrustFactor = defaultThrustFactor*addedThrustForce;
+        }
+
+        //Add thrust force to player
+        rigidBody2D.AddForce(transform.right*thrustFactor);
+
+        //Calculate the direction of no-input flight vector
+        directionVector = Vector3.Cross(transform.position, new Vector3(0, 0, 1));
+
+        //If player is flying counterclockwise reverse the direction vector and input angles
+        if ((input && inputVector.x < 0) || (!input && !flyingClockwiseLastFrame))
+        {
+            directionVector = -1 * directionVector;
+            inputAngle += 180f;
+        }
+        
+        //Determine target angle based on input or no-input
+        if (input)
+        {
+            targetAngle = Mathf.Rad2Deg * Mathf.Atan2(directionVector.y, directionVector.x)+ inputAngle;
         }
         else
         {
-            xThrust = transform.right * defaultThrustFactor;
-        }
-
-        if(yInput)
-        {
-            yThrust = inputVector.y * transform.up;
-            if (!flyingClockwise)
-            {
-                yThrust = -1 * yThrust;
-            }
-        }
-
-        thrustVector = xThrust * addedThrustForce;
-        rigidBody2D.AddForce(thrustVector);
-
-        //Correct angle for camera rotation only
-        directionVector = Vector3.Cross(transform.position, new Vector3(0, 0, 1)).normalized;
-
-        //if (inputVector.x < 0 || (inputVector.x == 0 && !flyingClockwiseLastFrame))
-        if ((xInput && inputVector.x < 0) || (!xInput && !flyingClockwiseLastFrame))
-        {
-            directionVector = -1 * directionVector;
-        }
-
-        targetAngleZ = Mathf.Rad2Deg * Mathf.Atan2(directionVector.y, directionVector.x);
-
-        if (yInput)
-        {
-            targetAngleZ = flyingClockwise ? targetAngleZ + inputVector.y * 70 : targetAngleZ - inputVector.y * 70;
+            targetAngle = Mathf.Rad2Deg * Mathf.Atan2(directionVector.y, directionVector.x);
         }
 
         //Update player rotation
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngleZ), rotateSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
         //Update roll rotation
         childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
 

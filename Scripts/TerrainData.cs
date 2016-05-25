@@ -6,14 +6,16 @@ public class TerrainData : MonoBehaviour {
     public TextAsset baselineFaces;
     public float terrainScale = 40.0f;
     public Vector3 terrainOffset = new Vector3(0, 0, 0);
-    public GameObject terrainTilePrefab;
+    public List<GameObject> terrainTilePrefab = new List<GameObject>();
     public GameObject playerTerrainPrefab;
+
     [HideInInspector]
     public _Levels activeTerrain;
     [HideInInspector]
     public bool terrainGenerated = false;
-    private List<GameObject> playerTerrains = new List<GameObject>();
-    private List<Vector3>[] playerTerrainVertices = new List<Vector3>[2];
+
+    public List<GameObject> playerTerrains = new List<GameObject>();
+    public List<Vector3>[] playerTerrainVertices = new List<Vector3>[2];
     private List<Vector4> terrainFaces = new List<Vector4>();
 
     private static TerrainData instance;
@@ -51,11 +53,22 @@ public class TerrainData : MonoBehaviour {
         //This method (re)generates randomized terrain for both players
 
         //Clear player terrain list
-        playerTerrains.Clear();
+        
+        if (terrainGenerated)
+        {
+            Debug.Log("destroying");
+            Destroy(playerTerrains[0]);
+            Destroy(playerTerrains[1]);
+            playerTerrains.Clear();
+            playerTerrainVertices[0]= null;
+            playerTerrainVertices[1] = null;
+        }
 
         //parse vertices data from input file, scale, and randomize for each player
         ParseScaleRandomizeVertices(playerTerrainVertices);
 
+
+        int usedIndex = -1;
         //Generate player one and player two terrains
         for (int i = 0; i < 2; i++)
         {
@@ -65,10 +78,17 @@ public class TerrainData : MonoBehaviour {
             playerTerrains[i].name = (i + 1).ToString();
             //Set parent to the GameController GameObject and disable it
             playerTerrains[i].transform.parent = transform;
-            playerTerrains[i].SetActive(false);
             //Create terrain tiles for the current player
-            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i]);
+            
+            int nextIndex = usedIndex;
+            while(nextIndex == usedIndex)
+            {
+                nextIndex = Mathf.RoundToInt(Random.Range(0f, 2f));
+            }
+            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], nextIndex );
+            usedIndex = nextIndex;
         }
+        ActivateTerrain(_Levels.Neutral);
     }
 
     public void ActivateTerrain(_Levels level){
@@ -92,7 +112,6 @@ public class TerrainData : MonoBehaviour {
     private void ParseScaleRandomizeVertices(List<Vector3>[] playerTerrainVertices)
     {
         //This method parses the vertices, scales, and randomizes them for each player
-
         playerTerrainVertices[0] = new List<Vector3>();
         playerTerrainVertices[1] = new List<Vector3>();
         //Parse terrain vertex data and scale
@@ -126,7 +145,7 @@ public class TerrainData : MonoBehaviour {
         }
     }
 
-    private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices)
+    private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int index)
     {
         Vector3 tilePosition;
         float tileDepth;
@@ -158,7 +177,7 @@ public class TerrainData : MonoBehaviour {
             }
 
             //Instantiate tile prefab
-            GameObject newTile = Instantiate(terrainTilePrefab, tilePosition + terrainOffset, Quaternion.identity) as GameObject;
+            GameObject newTile = Instantiate(terrainTilePrefab[(int)Mathf.RoundToInt(Random.Range(0f,2f)+index*3)], tilePosition + terrainOffset, Quaternion.identity) as GameObject;
             newTile.transform.parent = playerTerrain.transform;
             //Create mesh
             GenerateTile(newTile, newVertices, tileDepth);

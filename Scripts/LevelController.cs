@@ -9,34 +9,33 @@ public class LevelController : MonoBehaviour {
     void Start()
     {
         terrainData = GameObject.FindGameObjectWithTag(_Tags.gameController).GetComponent<TerrainData>();
+
+        //Activate the terrain that is stored in the state variable on TerrainData
         if (terrainData.terrainGenerated)
         {
             terrainData.ActivateTerrain(terrainData.activeTerrain);
         }
     }
 
-    void Update()
+    public void PlayerOne()
     {
-        if (CrossPlatformInputManager.GetButtonDown("LevelOne"))
-        {
-            CrossPlatformInputManager.SetButtonUp("LevelOne");
-            terrainData.activeTerrain = _Levels.PlayerOne;
-            SceneManager.LoadScene(_Scenes.sceneAtmosphereTest);
-        }
+        CrossPlatformInputManager.SetButtonUp("LevelOne");
+        terrainData.activeTerrain = _Levels.PlayerOne;
+        SceneManager.LoadScene(_Scenes.sceneAtmosphereTest);
+    }
 
-        if (CrossPlatformInputManager.GetButtonDown("LevelTwo"))
-        {
-            CrossPlatformInputManager.SetButtonUp("LevelTwo");
-            terrainData.activeTerrain = _Levels.PlayerTwo;
-            SceneManager.LoadScene(_Scenes.sceneAtmosphereTest);
-        }
+    public void PlayerTwo()
+    {
+        CrossPlatformInputManager.SetButtonUp("LevelTwo");
+        terrainData.activeTerrain = _Levels.PlayerTwo;
+        SceneManager.LoadScene(_Scenes.sceneAtmosphereTest);
+    }
 
-        if (CrossPlatformInputManager.GetButtonDown("Neutral"))
-        {
-            CrossPlatformInputManager.SetButtonUp("Neutral");
-            terrainData.activeTerrain = _Levels.Neutral;
-            SceneManager.LoadScene(_Scenes.sceneSpaceTest);
-        }
+    public void Neutral()
+    {
+        CrossPlatformInputManager.SetButtonUp("Neutral");
+        terrainData.activeTerrain = _Levels.Neutral;
+        SceneManager.LoadScene(_Scenes.sceneSpaceTest);
     }
 	
 }
