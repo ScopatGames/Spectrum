@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class SmoothCameraAtmosphere : MonoBehaviour {
     public float lagTime = 12f;

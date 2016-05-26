@@ -16,8 +16,9 @@ public class TerrainData : MonoBehaviour {
 
     public List<GameObject> playerTerrains = new List<GameObject>();
     public List<Vector3>[] playerTerrainVertices = new List<Vector3>[2];
-    private List<Vector4> terrainFaces = new List<Vector4>();
 
+    private List<Vector4> terrainFaces = new List<Vector4>();
+    private PlayerData playerData;
     private static TerrainData instance;
 
     void Awake()
@@ -31,6 +32,8 @@ public class TerrainData : MonoBehaviour {
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            playerData = GetComponent<PlayerData>();
+            activeTerrain = _Levels.Neutral;
         }
     }
 
@@ -56,19 +59,22 @@ public class TerrainData : MonoBehaviour {
         
         if (terrainGenerated)
         {
-            Debug.Log("destroying");
             Destroy(playerTerrains[0]);
             Destroy(playerTerrains[1]);
             playerTerrains.Clear();
-            playerTerrainVertices[0]= null;
-            playerTerrainVertices[1] = null;
+            playerTerrainVertices[0].Clear();
+            playerTerrainVertices[1].Clear();
         }
+
+        //Pick colors
+        playerData.PlayerColors();
+
+        //Assign color to terrain tiles
+        AssignColorToTerrainTiles();
 
         //parse vertices data from input file, scale, and randomize for each player
         ParseScaleRandomizeVertices(playerTerrainVertices);
 
-
-        int usedIndex = -1;
         //Generate player one and player two terrains
         for (int i = 0; i < 2; i++)
         {
@@ -79,14 +85,7 @@ public class TerrainData : MonoBehaviour {
             //Set parent to the GameController GameObject and disable it
             playerTerrains[i].transform.parent = transform;
             //Create terrain tiles for the current player
-            
-            int nextIndex = usedIndex;
-            while(nextIndex == usedIndex)
-            {
-                nextIndex = Mathf.RoundToInt(Random.Range(0f, 2f));
-            }
-            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], nextIndex );
-            usedIndex = nextIndex;
+            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
         }
         ActivateTerrain(_Levels.Neutral);
     }
@@ -106,6 +105,17 @@ public class TerrainData : MonoBehaviour {
                 playerTerrains[0].SetActive(false);
                 playerTerrains[1].SetActive(true);
                 break;
+        }
+    }
+
+    private void AssignColorToTerrainTiles()
+    {
+        MeshRenderer mR;
+        for (int i = 0; i < 2; i++)
+        {
+            mR = terrainTilePrefab[i].GetComponent<MeshRenderer>();
+            mR.sharedMaterial.SetColor("_Color", playerData.playerColorDictionaries[i][_ColorType.BaseMain.ToString()]);
+            mR.sharedMaterial.SetColor("_RimColor", playerData.playerColorDictionaries[i][_ColorType.BaseRim.ToString()]);
         }
     }
 
@@ -145,11 +155,12 @@ public class TerrainData : MonoBehaviour {
         }
     }
 
-    private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int index)
+    private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
     {
         Vector3 tilePosition;
         float tileDepth;
         int numVertices;
+
         for (int i = 0; i < terrainFaces.Count; i++)
         {
             //Check if face is a triangle or quad
@@ -177,7 +188,7 @@ public class TerrainData : MonoBehaviour {
             }
 
             //Instantiate tile prefab
-            GameObject newTile = Instantiate(terrainTilePrefab[(int)Mathf.RoundToInt(Random.Range(0f,2f)+index*3)], tilePosition + terrainOffset, Quaternion.identity) as GameObject;
+            GameObject newTile = Instantiate(terrainTilePrefab[terrainIndex], tilePosition + terrainOffset, Quaternion.identity) as GameObject;
             newTile.transform.parent = playerTerrain.transform;
             //Create mesh
             GenerateTile(newTile, newVertices, tileDepth);

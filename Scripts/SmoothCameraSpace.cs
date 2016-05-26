@@ -8,7 +8,6 @@ public class SmoothCameraSpace : MonoBehaviour {
     [Header("Enter the half width and height of level in world units")]
     public Vector2 levelExtents;
 
-
     private Camera cam;
     public Vector2 cameraExtents;
 
@@ -28,6 +27,12 @@ public class SmoothCameraSpace : MonoBehaviour {
 			to.z = transform.position.z;
 			transform.position -= (from - to) * lagTime * Time.deltaTime;
     	}
+        else
+        {
+            //Set player
+            player = GameObject.FindGameObjectWithTag(_Tags.playerOne).transform;
+        }
+
         float newXPos;
         float newYPos; 
 
