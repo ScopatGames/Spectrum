@@ -28,7 +28,7 @@ public class PlayerData : MonoBehaviour
 
     public void PlayerColors()
     {
-        _ColorDictionary colorDictionary = new _ColorDictionary(colorList);
+        ColorDictionary colorDictionary = new ColorDictionary(colorList);
         //Pick colors
         if (randomColors)
         {
@@ -47,7 +47,7 @@ public class PlayerData : MonoBehaviour
 
     public void SpawnPlayerSpace(_Levels playerNumber, Vector3 spawnPosition, Quaternion spawnRotation)
     {
-        int playerIndex = (int)playerNumber - 1;
+        int playerIndex = (playerNumber == _Levels.PlayerOne)? 0 : 1;
         players[playerIndex] = Instantiate(playerPrefabSpace, spawnPosition, spawnRotation) as GameObject;
         players[playerIndex].name = playerNumber.ToString();
         players[playerIndex].GetComponentInChildren<MeshRenderer>().material.color = playerColorDictionaries[playerIndex][_ColorType.PlayerShipSpace.ToString()];
@@ -64,7 +64,7 @@ public class PlayerData : MonoBehaviour
 
     public void SpawnPlayerPlanet(_Levels playerNumber, Vector3 spawnPosition, Quaternion spawnRotation)
     {
-        int playerIndex = (int)playerNumber - 1;
+        int playerIndex = (playerNumber == _Levels.PlayerOne) ? 0 : 1;
         players[playerIndex] = Instantiate(playerPrefabPlanet, spawnPosition, spawnRotation) as GameObject;
         players[playerIndex].name = playerNumber.ToString();
         players[playerIndex].GetComponentInChildren<MeshRenderer>().material.color = playerColorDictionaries[playerIndex][_ColorType.PlayerShipPlanet.ToString()];

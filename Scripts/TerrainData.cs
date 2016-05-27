@@ -34,22 +34,10 @@ public class TerrainData : MonoBehaviour {
             DontDestroyOnLoad(gameObject);
             playerData = GetComponent<PlayerData>();
             activeTerrain = _Levels.Neutral;
-        }
-    }
-
-	void Start () {
-        //If the terrain has not be generated, do so:
-        if (!terrainGenerated)
-        {
             //parse face data from input file; never needs to be re-run
             ParseFaces();
-
-            //Generate player one and player two terrains
-            RegenerateTerrain();
-
-            terrainGenerated = true;
         }
-	}
+    }
 
     public void RegenerateTerrain()
     {
@@ -88,6 +76,7 @@ public class TerrainData : MonoBehaviour {
             GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
         }
         ActivateTerrain(_Levels.Neutral);
+        terrainGenerated = true;
     }
 
     public void ActivateTerrain(_Levels level){

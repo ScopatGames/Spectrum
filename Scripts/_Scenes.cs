@@ -3,6 +3,7 @@ using System.Collections;
 
 public class _Scenes : MonoBehaviour {
 
-    public const string sceneSpaceTest = "sceneSpaceTest";
-    public const string sceneAtmosphereTest = "sceneAtmosphereTest";
+    public const string sceneBattleSpace = "sceneBattleSpace";
+    public const string sceneBattlePlanet = "sceneBattlePlanet";
+    public const string sceneMainMenu = "sceneMainMenu";
 }

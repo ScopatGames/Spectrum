@@ -29,7 +29,7 @@ public class SmoothCameraSpace : MonoBehaviour {
     	}
         else
         {
-            //Set player
+            //Set player - delete this line once a Main Menu is built, where the terrain will be generated
             player = GameObject.FindGameObjectWithTag(_Tags.playerOne).transform;
         }
 
