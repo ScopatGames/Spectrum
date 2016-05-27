@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 
 public class TerrainData : MonoBehaviour {
-    public TextAsset baselineVertices;
-    public TextAsset baselineFaces;
+    public TextAsset textInputVertices;
+    public TextAsset textInputFaces;
     public float terrainScale = 40.0f;
-    public Vector3 terrainOffset = new Vector3(0, 0, 0);
     public List<GameObject> terrainTilePrefab = new List<GameObject>();
     public GameObject playerTerrainPrefab;
 
@@ -13,11 +12,12 @@ public class TerrainData : MonoBehaviour {
     public _Levels activeTerrain;
     [HideInInspector]
     public bool terrainGenerated = false;
-
+    [HideInInspector]
     public List<GameObject> playerTerrains = new List<GameObject>();
-    public List<Vector3>[] playerTerrainVertices = new List<Vector3>[2];
 
-    private List<Vector4> terrainFaces = new List<Vector4>();
+    private List<Vector4> parsedTerrainFaces;
+    private List<Vector3> parsedTerrainVertices;
+    private List<Vector3>[] playerTerrainVertices;
     private PlayerData playerData;
     private static TerrainData instance;
 
@@ -34,52 +34,16 @@ public class TerrainData : MonoBehaviour {
             DontDestroyOnLoad(gameObject);
             playerData = GetComponent<PlayerData>();
             activeTerrain = _Levels.Neutral;
-            //parse face data from input file; never needs to be re-run
-            ParseFaces();
+            //parse face and vertex data from input files
+            parsedTerrainFaces = ParseFaces(textInputFaces);
+            parsedTerrainVertices = ParseVertices(textInputVertices);
         }
     }
 
-    public void RegenerateTerrain()
+    //PUBLIC METHODS
+    //------------------------------------------------
+    public void ActivateTerrain(_Levels level)
     {
-        //This method (re)generates randomized terrain for both players
-
-        //Clear player terrain list
-        
-        if (terrainGenerated)
-        {
-            Destroy(playerTerrains[0]);
-            Destroy(playerTerrains[1]);
-            playerTerrains.Clear();
-            playerTerrainVertices[0].Clear();
-            playerTerrainVertices[1].Clear();
-        }
-
-        //Pick colors
-        playerData.PlayerColors();
-
-        //Assign color to terrain tiles
-        AssignColorToTerrainTiles();
-
-        //parse vertices data from input file, scale, and randomize for each player
-        ParseScaleRandomizeVertices(playerTerrainVertices);
-
-        //Generate player one and player two terrains
-        for (int i = 0; i < 2; i++)
-        {
-            //Create the current player terrain tile container
-            playerTerrains.Add(Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity) as GameObject);
-            //Rename the terrain container to match current player
-            playerTerrains[i].name = (i + 1).ToString();
-            //Set parent to the GameController GameObject and disable it
-            playerTerrains[i].transform.parent = transform;
-            //Create terrain tiles for the current player
-            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
-        }
-        ActivateTerrain(_Levels.Neutral);
-        terrainGenerated = true;
-    }
-
-    public void ActivateTerrain(_Levels level){
         switch (level)
         {
             case _Levels.Neutral:
@@ -97,6 +61,46 @@ public class TerrainData : MonoBehaviour {
         }
     }
 
+    public void RegenerateTerrain()
+    {
+        //This method (re)generates randomized terrain for both players
+
+        //Clear player terrain list
+        
+        if (terrainGenerated)
+        {
+            Destroy(playerTerrains[0]);
+            Destroy(playerTerrains[1]);
+            playerTerrains.Clear();
+        }
+
+        //Pick colors
+        playerData.AssignPlayerColors();
+
+        //Assign color to terrain tiles
+        AssignColorToTerrainTiles();
+
+        //parse vertices data from input file, scale, and randomize for each player
+        playerTerrainVertices = RandomizeVertices(parsedTerrainVertices);
+
+        //Generate player one and player two terrains
+        for (int i = 0; i < 2; i++)
+        {
+            //Create the current player terrain tile container
+            playerTerrains.Add(Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity) as GameObject);
+            //Rename the terrain container to match current player
+            playerTerrains[i].name = (i + 1).ToString();
+            //Set parent to the GameController GameObject and disable it
+            playerTerrains[i].transform.parent = transform;
+            //Create terrain tiles for the current player
+            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
+        }
+        ActivateTerrain(_Levels.Neutral);
+        terrainGenerated = true;
+    }
+
+    //PRIVATE METHODS
+    //--------------------------------------------------------------
     private void AssignColorToTerrainTiles()
     {
         MeshRenderer mR;
@@ -108,40 +112,17 @@ public class TerrainData : MonoBehaviour {
         }
     }
 
-    private void ParseScaleRandomizeVertices(List<Vector3>[] playerTerrainVertices)
+    private Vector3 CalculateCentroid(Vector3[] vertices)
     {
-        //This method parses the vertices, scales, and randomizes them for each player
-        playerTerrainVertices[0] = new List<Vector3>();
-        playerTerrainVertices[1] = new List<Vector3>();
-        //Parse terrain vertex data and scale
-        float randomScaleFactorOne, randomScaleFactorTwo, value0, value1;
-        string[] values;
-        string[] fileRows = baselineVertices.text.Split('\n');
-        for (int i = 0; i < (fileRows.Length - 1); i++)
+        //This script calculates the centroid (transform.position) of the quad tile
+        Vector3 centroid = Vector3.zero;
+        for (int i = 0; i < vertices.Length; i++)
         {
-            randomScaleFactorOne = Random.Range(1.0f, 1.1f);
-            randomScaleFactorTwo = Random.Range(1.0f, 1.1f);
-            values = fileRows[i].Split(',');
-            value0 = float.Parse(values[0]);
-            value1 = float.Parse(values[1]);
-            playerTerrainVertices[0].Add(new Vector3(value0, value1, 0.0f) * terrainScale * randomScaleFactorOne);
-            playerTerrainVertices[1].Add(new Vector3(value0, value1, 0.0f) * terrainScale * randomScaleFactorTwo);
+            centroid += vertices[i];
         }
-    } 
+        centroid /= vertices.Length;
 
-    private void ParseFaces()
-    {
-        //This method parses the faces' vertex pointers from the input file
-
-        terrainFaces.Clear();
-        //Parse face data
-        string[] values;
-        string[] fileRows = baselineFaces.text.Split('\n');
-        for (int i = 0; i < (fileRows.Length - 1); i++)
-        {
-            values = fileRows[i].Split(',');
-            terrainFaces.Add(new Vector4(int.Parse(values[0]), int.Parse(values[1]), int.Parse(values[2]), int.Parse(values[3])));
-        }
+        return centroid;
     }
 
     private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
@@ -150,10 +131,10 @@ public class TerrainData : MonoBehaviour {
         float tileDepth;
         int numVertices;
 
-        for (int i = 0; i < terrainFaces.Count; i++)
+        for (int i = 0; i < parsedTerrainFaces.Count; i++)
         {
             //Check if face is a triangle or quad
-            numVertices = (terrainFaces[i][3] == -1) ? 3 : 4;
+            numVertices = (parsedTerrainFaces[i][3] == -1) ? 3 : 4;
 
             //Calculate a random tile depth
             tileDepth = (numVertices == 3) ? Random.Range(0.4f, 0.8f) * terrainScale / 10f : Random.Range(1.0f, 1.4f) * terrainScale / 10f;
@@ -166,7 +147,7 @@ public class TerrainData : MonoBehaviour {
             Vector3[] newVertices = new Vector3[numVertices];
             for (int j = 0; j < numVertices; j++)
             {
-                newVertices[j] = playerTerrainVertices[(int)terrainFaces[i][j]];
+                newVertices[j] = playerTerrainVertices[(int)parsedTerrainFaces[i][j]];
             }
             tilePosition = CalculateCentroid(newVertices);
 
@@ -177,7 +158,7 @@ public class TerrainData : MonoBehaviour {
             }
 
             //Instantiate tile prefab
-            GameObject newTile = Instantiate(terrainTilePrefab[terrainIndex], tilePosition + terrainOffset, Quaternion.identity) as GameObject;
+            GameObject newTile = Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity) as GameObject;
             newTile.transform.parent = playerTerrain.transform;
             //Create mesh
             GenerateTile(newTile, newVertices, tileDepth);
@@ -188,7 +169,7 @@ public class TerrainData : MonoBehaviour {
     {
         //This class generates mesh and collider geometry for each tile gameobject.
         List<Vector3> verticesList = new List<Vector3>();
-        int[] triangles = null; 
+        int[] triangles = null;
         PolygonCollider2D polygonCollider2D;
 
         int numVertices = vertices.Length;
@@ -249,17 +230,52 @@ public class TerrainData : MonoBehaviour {
         mesh.RecalculateNormals();
     }
 
-    private Vector3 CalculateCentroid(Vector3[] vertices)
+    private List<Vector4> ParseFaces(TextAsset textInputFaces)
     {
-        //This script calculates the centroid (transform.position) of the quad tile
-        Vector3 centroid = Vector3.zero;
-        for(int i = 0; i < vertices.Length; i++)
+        //This method parses the faces' vertex pointers from the input file
+        List<Vector4> parsedTerrainFaces = new List<Vector4>();
+        //Parse face data
+        string[] values;
+        string[] fileRows = textInputFaces.text.Split('\n');
+        for (int i = 0; i < (fileRows.Length - 1); i++)
         {
-            centroid += vertices[i]; 
+            values = fileRows[i].Split(',');
+            parsedTerrainFaces.Add(new Vector4(int.Parse(values[0]), int.Parse(values[1]), int.Parse(values[2]), int.Parse(values[3])));
         }
-        centroid /= vertices.Length;
-       
-        return centroid;
+        return parsedTerrainFaces;
     }
 
+    private List<Vector3> ParseVertices(TextAsset textInputVertices)
+    {
+        //This method parses the vertices from the input file
+        List<Vector3> parsedTerrainVertices = new List<Vector3>();
+        string[] values;
+        string[] fileRows = textInputVertices.text.Split('\n');
+        for (int i = 0; i < (fileRows.Length - 1); i++)
+        {
+            values = fileRows[i].Split(',');
+            Vector3 value = new Vector3(float.Parse(values[0]), float.Parse(values[1]), 0.0f);
+            parsedTerrainVertices.Add(value);
+        }
+        return parsedTerrainVertices;
+    }
+
+    private List<Vector3>[] RandomizeVertices(List<Vector3> parsedTerrainVertices)
+    {
+        //This method parses the vertices, scales, and randomizes them for each player
+        playerTerrainVertices = new List<Vector3>[2];
+        
+        //scale and randomize vertex data
+        float randomScaleFactor;
+        for (int i = 0; i < 2; i++)
+        {
+            playerTerrainVertices[i] = new List<Vector3>();
+            for (int j = 0; j < parsedTerrainVertices.Count; j++)
+            {
+                randomScaleFactor = Random.Range(1.0f, 1.1f);
+                playerTerrainVertices[i].Add(parsedTerrainVertices[j] * terrainScale * randomScaleFactor);
+            }
+        }
+        return playerTerrainVertices;
+    } 
 }

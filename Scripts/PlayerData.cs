@@ -19,16 +19,18 @@ public class PlayerData : MonoBehaviour
     [HideInInspector]
     public GameObject[] players = new GameObject[2];
 
+    private ColorDictionary colorDictionary;
+
 
 
     void Awake()
     {
-        PlayerColors();
+        //Instantiate new color dictionary
+        colorDictionary = new ColorDictionary(colorList);
     }
 
-    public void PlayerColors()
+    public void AssignPlayerColors()
     {
-        ColorDictionary colorDictionary = new ColorDictionary(colorList);
         //Pick colors
         if (randomColors)
         {
@@ -40,7 +42,7 @@ public class PlayerData : MonoBehaviour
                 playerTwoColor = (_Colors)rnd.Next(0, 8);
             }
         }
-
+        //Assign color sub-dictionaries to each player
         playerColorDictionaries[0] = colorDictionary.GetColorDictionary(playerOneColor.ToString());
         playerColorDictionaries[1] = colorDictionary.GetColorDictionary(playerTwoColor.ToString());
     }

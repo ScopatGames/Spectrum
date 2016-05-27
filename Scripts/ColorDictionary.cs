@@ -4,13 +4,11 @@ using System.Collections.Generic;
 
 public class ColorDictionary {
     
-    private TextAsset colorList;
     private Dictionary<string, Dictionary<string, Color>> colorDictionary;
 
     //Constructor
-    public ColorDictionary(TextAsset cList)
+    public ColorDictionary(TextAsset colorList)
     {
-        colorList = cList;
         colorDictionary = new Dictionary<string, Dictionary<string, Color>>();
         //Parse color rows
         string[] fileRows = colorList.text.Split('\n');
