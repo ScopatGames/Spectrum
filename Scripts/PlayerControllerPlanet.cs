@@ -30,7 +30,7 @@ public class PlayerControllerPlanet : MonoBehaviour
         rigidBody2D = this.GetComponent<Rigidbody2D>();
 
         //Instantiate barrier
-        barrierIndicator = Instantiate(barrierIndicator, new Vector3(1000, 0, 0), Quaternion.identity) as GameObject;
+        barrierIndicator = (GameObject) Instantiate(barrierIndicator, new Vector3(1000, 0, 0), Quaternion.identity);
     }
 
     void FixedUpdate()

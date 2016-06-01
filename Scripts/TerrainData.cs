@@ -87,7 +87,7 @@ public class TerrainData : MonoBehaviour {
         for (int i = 0; i < 2; i++)
         {
             //Create the current player terrain tile container
-            playerTerrains.Add(Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity) as GameObject);
+            playerTerrains.Add((GameObject)Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity));
             //Rename the terrain container to match current player
             playerTerrains[i].name = (i + 1).ToString();
             //Set parent to the GameController GameObject and disable it
@@ -158,7 +158,7 @@ public class TerrainData : MonoBehaviour {
             }
 
             //Instantiate tile prefab
-            GameObject newTile = Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity) as GameObject;
+            GameObject newTile = (GameObject)Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity);
             newTile.transform.parent = playerTerrain.transform;
             //Create mesh
             GenerateTile(newTile, newVertices, tileDepth);
