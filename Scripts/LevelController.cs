@@ -20,6 +20,8 @@ public class LevelController : MonoBehaviour {
         switch (currentLevel)
         {
             case _Levels.MainMenu:
+                break;
+            case _Levels.Lobby:
                 //Regenerate terrain
                 terrainData.RegenerateTerrain();
                 break;
@@ -65,5 +67,12 @@ public class LevelController : MonoBehaviour {
         CrossPlatformInputManager.SetButtonUp("MainMenu");
         terrainData.activeTerrain = _Levels.Neutral;
         SceneManager.LoadScene(_Scenes.sceneMainMenu);
+    }
+
+    public void Lobby()
+    {
+        CrossPlatformInputManager.SetButtonUp("Lobby");
+        terrainData.activeTerrain = _Levels.Neutral;
+        SceneManager.LoadScene(_Scenes.sceneLobby);
     }
 }
