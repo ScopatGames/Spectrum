@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityStandardAssets.CrossPlatformInput;
 
-public class PlayerControllerPlanet : MonoBehaviour
+public class PlayerControllerPlanet : NetworkBehaviour
 {
     public float defaultThrustFactor = 0.3f;
     public float addedThrustForce = 50;
@@ -27,6 +28,10 @@ public class PlayerControllerPlanet : MonoBehaviour
 
     void Start()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
         rigidBody2D = this.GetComponent<Rigidbody2D>();
 
         //Instantiate barrier
@@ -35,6 +40,11 @@ public class PlayerControllerPlanet : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         //Get player inputs
         inputVector = new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f);
         //Test for input threshold:
@@ -108,6 +118,10 @@ public class PlayerControllerPlanet : MonoBehaviour
 
     void Update()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
         //Check to see if the player is flying upside-down
         if (rollIsAvailable && Vector3.Dot(childRollTransform.up, transform.position) < 0f)
         {

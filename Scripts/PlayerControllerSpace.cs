@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 
-public class PlayerControllerSpace : MonoBehaviour {
+public class PlayerControllerSpace : NetworkBehaviour {
     public float thrustForce = 5;
     public float maxVelocity = 10;
     public float boundaryRadius = 40;
@@ -16,6 +17,11 @@ public class PlayerControllerSpace : MonoBehaviour {
     private Rigidbody2D rigidBody2D;
 
     void Start () {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         rigidBody2D = GetComponent<Rigidbody2D>();
 
         //Instantiate barrier
@@ -24,6 +30,11 @@ public class PlayerControllerSpace : MonoBehaviour {
 
     void FixedUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         inputVector = Vector3.ClampMagnitude(new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f), 1.0f);
 
         if (inputVector.sqrMagnitude > 0.01)
