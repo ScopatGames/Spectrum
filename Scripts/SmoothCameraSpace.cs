@@ -4,6 +4,7 @@ using System.Collections;
 public class SmoothCameraSpace : MonoBehaviour {
 
 	public float lagTime = 12f;
+    [HideInInspector]
 	public Transform player;
     [Header("Enter the half width and height of level in world units")]
     public Vector2 levelExtents;
@@ -27,11 +28,6 @@ public class SmoothCameraSpace : MonoBehaviour {
 			to.z = transform.position.z;
 			transform.position -= (from - to) * lagTime * Time.deltaTime;
     	}
-        else
-        {
-            //Set player - delete this line once a Main Menu is built, where the terrain will be generated
-            player = GameObject.FindGameObjectWithTag(_Tags.playerOne).transform;
-        }
 
         float newXPos;
         float newYPos; 

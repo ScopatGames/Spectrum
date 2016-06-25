@@ -9,7 +9,6 @@ public class PlayerControllerPlanet : NetworkBehaviour
     public float outerBoundaryRadius = 80;
     public float rotateSpeed = 3;
     public float rollSpeed = 3;
-    public GameObject barrierIndicator;
     public Transform childRollTransform;
 
     private bool input;
@@ -24,18 +23,20 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private float thrustFactor;
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
+    private PlayerManager playerManager;
 
 
     void Start()
     {
         if (!isLocalPlayer)
         {
+            enabled = false;
             return;
         }
         rigidBody2D = this.GetComponent<Rigidbody2D>();
+        playerManager = GetComponent<PlayerManager>();
 
-        //Instantiate barrier
-        barrierIndicator = (GameObject) Instantiate(barrierIndicator, new Vector3(1000, 0, 0), Quaternion.identity);
+        enabled = false;
     }
 
     void FixedUpdate()
@@ -106,12 +107,12 @@ public class PlayerControllerPlanet : NetworkBehaviour
             transform.position = newPos;
 
             //Move Barrier Indicator
-            barrierIndicator.transform.position = transform.position;
-            barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicator.transform.position.x, barrierIndicator.transform.position.y));
+            playerManager.barrierIndicator.transform.position = transform.position;
+            playerManager.barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-playerManager.barrierIndicator.transform.position.x, playerManager.barrierIndicator.transform.position.y));
         }
         else
         {
-            barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
+            playerManager.barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }

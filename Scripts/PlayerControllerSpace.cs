@@ -10,22 +10,24 @@ public class PlayerControllerSpace : NetworkBehaviour {
     public float rotateSpeed = 10;
     public float moveCounter;
     public float moveCounterReset = 0.3f;
-    public GameObject barrierIndicator;
 
     private Vector3 inputVector;
     private float targetAngle;
     private Rigidbody2D rigidBody2D;
+    private PlayerManager playerManager;
 
     void Start () {
         if (!isLocalPlayer)
         {
+            enabled = false;
             return;
         }
 
         rigidBody2D = GetComponent<Rigidbody2D>();
+        playerManager = GetComponent<PlayerManager>();
 
-        //Instantiate barrier
-        barrierIndicator = (GameObject)Instantiate(barrierIndicator, new Vector3(1000, 0, 0), Quaternion.identity);
+        //after initialization, disable self
+        enabled = false;
     }
 
     void FixedUpdate()
@@ -58,12 +60,12 @@ public class PlayerControllerSpace : NetworkBehaviour {
             transform.position = newPos;
 
             //Move Barrier Indicator
-            barrierIndicator.transform.position = transform.position;
-            barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicator.transform.position.x, barrierIndicator.transform.position.y));
+            playerManager.barrierIndicator.transform.position = transform.position;
+            playerManager.barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-playerManager.barrierIndicator.transform.position.x, playerManager.barrierIndicator.transform.position.y));
         }
         else
         {
-            barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
+            playerManager.barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }

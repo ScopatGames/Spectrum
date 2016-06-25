@@ -2,6 +2,7 @@
 
 public class SmoothCameraPlanet : MonoBehaviour {
     public float lagTime = 12f;
+    [HideInInspector]
     public Transform player;
     public float rotateSpeed = 10;
     public float radialOffset = 8;

@@ -4,17 +4,13 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class LevelController : MonoBehaviour {
     public _Levels currentLevel;
-    public GameObject mainCamera;
+    //public GameObject mainCamera;
 
-    private GameObject gameController;
-    private TerrainData terrainData;
-    private PlayerData playerData;
+    private GameController gameController;
 
     void Start()
     {
-        gameController = GameObject.FindGameObjectWithTag(_Tags.gameController);
-        terrainData = gameController.GetComponent<TerrainData>();
-        playerData = gameController.GetComponent<PlayerData>();
+        gameController = GameObject.FindGameObjectWithTag(_Tags.gameController).GetComponent<GameController>();
 
         //Initialize the current level
         switch (currentLevel)
@@ -23,20 +19,22 @@ public class LevelController : MonoBehaviour {
                 break;
             case _Levels.Lobby:
                 //Regenerate terrain
-                terrainData.RegenerateTerrain();
+                //terrainData.RegenerateTerrain();
                 break;
             case _Levels.Neutral:
+                /*
                 playerData.SpawnPlayerSpace(_Levels.PlayerOne, new Vector3(-3.0f, 0.0f, 0.0f), Quaternion.identity);
                 playerData.SpawnPlayerSpace(_Levels.PlayerTwo, new Vector3(3.0f, 0.0f, 0.0f), Quaternion.identity);
-                terrainData.ActivateTerrain(terrainData.activeTerrain);
-                mainCamera.GetComponent<SmoothCameraSpace>().player = playerData.players[0].transform;
+                */
+                gameController.ActivateTerrain(gameController.activeTerrain);
+                //mainCamera.GetComponent<SmoothCameraSpace>().player = playerData.players[0].transform;
                 break;
             case _Levels.PlayerOne:
-                _Levels playerType = (terrainData.activeTerrain == _Levels.PlayerOne) ? _Levels.PlayerTwo : _Levels.PlayerOne;
+                _Levels playerType = (gameController.activeTerrain == _Levels.PlayerOne) ? _Levels.PlayerTwo : _Levels.PlayerOne;
                 int playerIndex = (playerType == _Levels.PlayerOne) ? 0 : 1;
-                playerData.SpawnPlayerPlanet(playerType, new Vector3(0.0f, 49.9f, 0.0f), Quaternion.identity);
-                terrainData.ActivateTerrain(terrainData.activeTerrain);
-                mainCamera.GetComponent<SmoothCameraPlanet>().player = playerData.players[playerIndex].transform;
+                //playerData.SpawnPlayerPlanet(playerType, new Vector3(0.0f, 49.9f, 0.0f), Quaternion.identity);
+                gameController.ActivateTerrain(gameController.activeTerrain);
+                //mainCamera.GetComponent<SmoothCameraPlanet>().player = playerData.players[playerIndex].transform;
                 break;
         }
     }
@@ -44,35 +42,35 @@ public class LevelController : MonoBehaviour {
     public void PlayerOne()
     {
         CrossPlatformInputManager.SetButtonUp("LevelOne");
-        terrainData.activeTerrain = _Levels.PlayerOne;
+        gameController.activeTerrain = _Levels.PlayerOne;
         SceneManager.LoadScene(_Scenes.sceneBattlePlanet);
     }
 
     public void PlayerTwo()
     {
         CrossPlatformInputManager.SetButtonUp("LevelTwo");
-        terrainData.activeTerrain = _Levels.PlayerTwo;
+        gameController.activeTerrain = _Levels.PlayerTwo;
         SceneManager.LoadScene(_Scenes.sceneBattlePlanet);
     }
 
     public void Neutral()
     {
         CrossPlatformInputManager.SetButtonUp("Neutral");
-        terrainData.activeTerrain = _Levels.Neutral;
+        gameController.activeTerrain = _Levels.Neutral;
         SceneManager.LoadScene(_Scenes.sceneBattleSpace);
     }
 
     public void MainMenu()
     {
         CrossPlatformInputManager.SetButtonUp("MainMenu");
-        terrainData.activeTerrain = _Levels.Neutral;
+        gameController.activeTerrain = _Levels.Neutral;
         SceneManager.LoadScene(_Scenes.sceneMainMenu);
     }
 
     public void Lobby()
     {
         CrossPlatformInputManager.SetButtonUp("Lobby");
-        terrainData.activeTerrain = _Levels.Neutral;
+        gameController.activeTerrain = _Levels.Neutral;
         SceneManager.LoadScene(_Scenes.sceneLobby);
     }
 }
