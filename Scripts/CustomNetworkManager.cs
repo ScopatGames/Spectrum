@@ -4,23 +4,23 @@ using UnityEngine.Networking;
 
 public class CustomNetworkManager : NetworkManager {
 
-    private GameController gameController;
+    private SetupManager setupManager;
     
     void Start()
     {
-        gameController = GameObject.FindGameObjectWithTag(_Tags.gameController).GetComponent<GameController>();
+        setupManager = GameObject.FindGameObjectWithTag(_Tags.lobbyManager).GetComponent<SetupManager>();
     }
 
     public override void OnStartServer()
     {
-        
-        gameController.RegenerateTerrain();
+
+        setupManager.RegenerateTerrain();
 
     }
 
     public override void OnStartClient(NetworkClient client)
     {
-        gameController.AssignPlayerColors();
+        setupManager.AssignPlayerColors();
     }
 
     public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
@@ -63,10 +63,10 @@ public class CustomNetworkManager : NetworkManager {
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
 
         //Assign color to player
-        player.GetComponentInChildren<MeshRenderer>().material.color = gameController.playerColorDictionaries[numPlayers-1][_ColorType.PlayerShipSpace.ToString()];
-        
+        player.GetComponentInChildren<MeshRenderer>().material.color = setupManager.playerColorDictionaries[numPlayers-1][_ColorType.PlayerShipSpace.ToString()];
+
         //Assign player to gameController
-        gameController.players[numPlayers-1] = player;
+        setupManager.players[numPlayers-1] = player;
     }
 
 }

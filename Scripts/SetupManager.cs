@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
-public class GameController : NetworkBehaviour {
-    static public GameController instance;
+public class SetupManager : NetworkBehaviour {
+    static public SetupManager instance;
 
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
@@ -142,7 +142,7 @@ public class GameController : NetworkBehaviour {
             playerTerrains.Add((GameObject)Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity));
             //Rename the terrain container to match current player
             playerTerrains[i].name = (i + 1).ToString();
-            //Set parent to the GameController GameObject and disable it
+            //Set parent to the SetupManager GameObject and disable it
             playerTerrains[i].transform.parent = transform;
             //Create terrain tiles for the current player
             GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
