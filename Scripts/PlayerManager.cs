@@ -1,21 +1,17 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 
-public class PlayerManager : NetworkBehaviour {
+[Serializable]
+public class PlayerManager {
 
-    public GameObject barrierIndicator;
-    public GameObject mainCamera;
+    public Color playerColor;
+    public Transform spawnPoint;
+    public int playerNumber;
+    public GameObject instance;
+    public string playerName;
 
-    void Awake () {
-        //Instantiate barrier
-        barrierIndicator = (GameObject)Instantiate(barrierIndicator, new Vector3(1000, 0, 0), Quaternion.identity);
+    public BarrierIndicatorManager barrierIndicatorManager;
 
-        //Set up main camera player reference
-        mainCamera = GameObject.FindGameObjectWithTag(_Tags.mainCamera);
-        mainCamera.GetComponent<SmoothCameraPlanet>().player = transform;
-        mainCamera.GetComponent<SmoothCameraSpace>().player = transform;
-
-    }
+    
   
 }

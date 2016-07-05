@@ -6,11 +6,9 @@ public class SceneController : MonoBehaviour {
     public _Levels currentLevel;
     //public GameObject mainCamera;
 
-    private SetupManager setupManager;
 
     void Start()
     {
-        setupManager = GameObject.FindGameObjectWithTag(_Tags.lobbyManager).GetComponent<SetupManager>();
 
         //Initialize the current level
         switch (currentLevel)

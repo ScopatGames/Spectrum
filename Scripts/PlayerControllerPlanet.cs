@@ -23,7 +23,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private float thrustFactor;
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
-    private PlayerManager playerManager;
+    private BarrierIndicatorManager barrierIndicatorManager;
 
 
     void Start()
@@ -34,7 +34,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
             return;
         }
         rigidBody2D = this.GetComponent<Rigidbody2D>();
-        playerManager = GetComponent<PlayerManager>();
+        barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
 
         enabled = false;
     }
@@ -107,12 +107,12 @@ public class PlayerControllerPlanet : NetworkBehaviour
             transform.position = newPos;
 
             //Move Barrier Indicator
-            playerManager.barrierIndicator.transform.position = transform.position;
-            playerManager.barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-playerManager.barrierIndicator.transform.position.x, playerManager.barrierIndicator.transform.position.y));
+            barrierIndicatorManager.barrierIndicator.transform.position = transform.position;
+            barrierIndicatorManager.barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicatorManager.barrierIndicator.transform.position.x, barrierIndicatorManager.barrierIndicator.transform.position.y));
         }
         else
         {
-            playerManager.barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
+            barrierIndicatorManager.barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }
