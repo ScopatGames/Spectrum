@@ -17,11 +17,6 @@ public class PlayerControllerSpace : NetworkBehaviour {
     private BarrierIndicatorManager barrierIndicatorManager;
 
     void Start () {
-        if (!isLocalPlayer)
-        {
-            enabled = false;
-            return;
-        }
 
         rigidBody2D = GetComponent<Rigidbody2D>();
         barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
@@ -30,24 +25,24 @@ public class PlayerControllerSpace : NetworkBehaviour {
         enabled = false;
     }
 
+
     void FixedUpdate()
     {
-        if (!isLocalPlayer)
+        if (isLocalPlayer)
         {
-            return;
-        }
 
-        inputVector = Vector3.ClampMagnitude(new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f), 1.0f);
+            inputVector = Vector3.ClampMagnitude(new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f), 1.0f);
 
-        if (inputVector.sqrMagnitude > 0.01)
-        {
-            if (rigidBody2D.velocity.sqrMagnitude < maxVelocity * maxVelocity)
+            if (inputVector.sqrMagnitude > 0.01)
             {
-                rigidBody2D.AddForce(transform.up * thrustForce * inputVector.sqrMagnitude);
-            }
+                if (rigidBody2D.velocity.sqrMagnitude < maxVelocity * maxVelocity)
+                {
+                    rigidBody2D.AddForce(transform.up * thrustForce * inputVector.sqrMagnitude);
+                }
 
-            targetAngle = Mathf.Rad2Deg * Mathf.Atan2(-inputVector.x, inputVector.y);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
+                targetAngle = Mathf.Rad2Deg * Mathf.Atan2(-inputVector.x, inputVector.y);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
+            }
         }
 
         ///////////BOUNDARY CONTROL/////////////
@@ -55,17 +50,20 @@ public class PlayerControllerSpace : NetworkBehaviour {
         Vector3 newPos;
         if (transform.position.sqrMagnitude > boundaryRadius * boundaryRadius)
         {
-            newPos = transform.position.normalized * boundaryRadius;
-            newPos.z = 0f;
-            transform.position = newPos;
+            if (isLocalPlayer)
+            {
+                newPos = transform.position.normalized * boundaryRadius;
+                newPos.z = 0f;
+                transform.position = newPos;
+            }
 
-            //Move Barrier Indicator
-            barrierIndicatorManager.barrierIndicator.transform.position = transform.position;
-            barrierIndicatorManager.barrierIndicator.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * Mathf.Atan2(-barrierIndicatorManager.barrierIndicator.transform.position.x, barrierIndicatorManager.barrierIndicator.transform.position.y));
+            //Enable Barrier Indicator
+            barrierIndicatorManager.EnableIndicator();
         }
         else
         {
-            barrierIndicatorManager.barrierIndicator.transform.position = new Vector3(1000f, 0f, 0f);
+            //Disable Barrier Indicator
+            barrierIndicatorManager.DisableIndicator();
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }

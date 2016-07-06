@@ -28,8 +28,8 @@ public class SceneController : MonoBehaviour {
                 //mainCamera.GetComponent<SmoothCameraSpace>().player = playerData.players[0].transform;
                 break;
             case _Levels.PlayerOne:
-                _Levels playerType = (SetupManager.activeTerrain == _Levels.PlayerOne) ? _Levels.PlayerTwo : _Levels.PlayerOne;
-                int playerIndex = (playerType == _Levels.PlayerOne) ? 0 : 1;
+                //_Levels playerType = (SetupManager.activeTerrain == _Levels.PlayerOne) ? _Levels.PlayerTwo : _Levels.PlayerOne;
+                //int playerIndex = (playerType == _Levels.PlayerOne) ? 0 : 1;
                 //playerData.SpawnPlayerPlanet(playerType, new Vector3(0.0f, 49.9f, 0.0f), Quaternion.identity);
                 SetupManager.ActivateTerrain(SetupManager.activeTerrain);
                 //mainCamera.GetComponent<SmoothCameraPlanet>().player = playerData.players[playerIndex].transform;

@@ -9,6 +9,7 @@ public class CustomNetworkManager : NetworkManager {
     void Start()
     {
         //setupManager = GameObject.FindGameObjectWithTag(_Tags.lobbyManager).GetComponent<SetupManager>();
+        setupManager = null;
     }
 
     public override void OnStartServer()

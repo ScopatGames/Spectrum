@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 public class GameManager : NetworkBehaviour {
 
     static public GameManager instance;
-    static public List<PlayerManager> players = new List<PlayerManager>();
+    static public List<PlayerManager> playerManagers = new List<PlayerManager>();
 
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
@@ -32,8 +32,6 @@ public class GameManager : NetworkBehaviour {
 
     [HideInInspector]
     public Dictionary<string, Color>[] playerColorDictionaries = new Dictionary<string, Color>[2];
-    //[HideInInspector]
-    //public GameObject[] players = new GameObject[2];
 
     private ColorDictionary colorDictionary;
     [SyncVar]
@@ -45,25 +43,18 @@ public class GameManager : NetworkBehaviour {
     void Awake()
     {
         //Singleton
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+        instance = this;
+        //DontDestroyOnLoad(gameObject);
 
-            //Instantiate new color dictionary
-            colorDictionary = new ColorDictionary(colorListTextAsset);
-            //playerData = GetComponent<PlayerData>();
+        //Instantiate new color dictionary
+        colorDictionary = new ColorDictionary(colorListTextAsset);
+        //playerData = GetComponent<PlayerData>();
 
-            activeTerrain = _Levels.Neutral;
+        activeTerrain = _Levels.Neutral;
 
-            //parse face and vertex data from input files
-            parsedTerrainFaces = ParseFaces(textInputFaces);
-            parsedTerrainVertices = ParseVertices(textInputVertices);
-        }
+        //parse face and vertex data from input files
+        parsedTerrainFaces = ParseFaces(textInputFaces);
+        parsedTerrainVertices = ParseVertices(textInputVertices);
     }
 
     //PUBLIC METHODS
@@ -87,6 +78,18 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
+    static public void AddPlayer(GameObject player, int playerNum, int playerColorIndex, string name)
+    {
+        PlayerManager tempPlayer = new PlayerManager();
+        tempPlayer.instance = player;
+        tempPlayer.playerNumber = playerNum;
+        tempPlayer.playerColorIndex = playerColorIndex;
+        tempPlayer.playerName = name;
+        tempPlayer.Setup();
+
+        playerManagers.Add(tempPlayer);
+    }
+
     public void AssignPlayerColors()
     {
         //Assign color enums
@@ -100,16 +103,13 @@ public class GameManager : NetworkBehaviour {
 
     public void PickRandomColors()
     {
-        if (randomColors)
+        int colorCount = System.Enum.GetNames(typeof(_Colors)).Length;
+        System.Random rnd = new System.Random();
+        playerOneColorIndex = rnd.Next(0, colorCount);
+        playerTwoColorIndex = playerOneColorIndex;
+        while (playerTwoColorIndex == playerOneColorIndex)
         {
-            int colorCount = System.Enum.GetNames(typeof(_Colors)).Length;
-            System.Random rnd = new System.Random();
-            playerOneColorIndex = rnd.Next(0, colorCount);
-            playerTwoColorIndex = playerOneColorIndex;
-            while (playerTwoColorIndex == playerOneColorIndex)
-            {
-                playerTwoColorIndex = rnd.Next(0, colorCount);
-            }
+            playerTwoColorIndex = rnd.Next(0, colorCount);
         }
     }
 
