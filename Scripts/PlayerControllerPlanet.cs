@@ -26,12 +26,10 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private BarrierIndicatorManager barrierIndicatorManager;
 
 
-    void Start()
+    void Awake()
     {
         rigidBody2D = this.GetComponent<Rigidbody2D>();
         barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
-
-        enabled = false;
     }
 
     void FixedUpdate()

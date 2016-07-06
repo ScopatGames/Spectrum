@@ -16,13 +16,10 @@ public class PlayerControllerSpace : NetworkBehaviour {
     private Rigidbody2D rigidBody2D;
     private BarrierIndicatorManager barrierIndicatorManager;
 
-    void Start () {
-
+    void Awake ()
+    {
         rigidBody2D = GetComponent<Rigidbody2D>();
         barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
-
-        //after initialization, disable self
-        enabled = false;
     }
 
 

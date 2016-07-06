@@ -14,7 +14,7 @@ public class GameManager : NetworkBehaviour {
     public List<GameObject> terrainTilePrefab = new List<GameObject>();
     public GameObject playerTerrainPrefab;
 
-    static public _Levels activeTerrain;
+    static public _GameState activeTerrain;
     [HideInInspector]
     public bool terrainGenerated = false;
     [HideInInspector]
@@ -50,7 +50,7 @@ public class GameManager : NetworkBehaviour {
         colorDictionary = new ColorDictionary(colorListTextAsset);
         //playerData = GetComponent<PlayerData>();
 
-        activeTerrain = _Levels.Neutral;
+        activeTerrain = _GameState.Neutral;
 
         //parse face and vertex data from input files
         parsedTerrainFaces = ParseFaces(textInputFaces);
@@ -59,19 +59,19 @@ public class GameManager : NetworkBehaviour {
 
     //PUBLIC METHODS
     //------------------------------------------------
-    static public void ActivateTerrain(_Levels level)
+    static public void ActivateTerrain(_GameState gameState)
     {
-        switch (level)
+        switch (gameState)
         {
-            case _Levels.Neutral:
+            case _GameState.Neutral:
                 playerTerrains[0].SetActive(false);
                 playerTerrains[1].SetActive(false);
                 break;
-            case _Levels.PlayerOne:
+            case _GameState.PlayerOne:
                 playerTerrains[0].SetActive(true);
                 playerTerrains[1].SetActive(false);
                 break;
-            case _Levels.PlayerTwo:
+            case _GameState.PlayerTwo:
                 playerTerrains[0].SetActive(false);
                 playerTerrains[1].SetActive(true);
                 break;
@@ -148,7 +148,7 @@ public class GameManager : NetworkBehaviour {
             //Create terrain tiles for the current player
             GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
         }
-        ActivateTerrain(_Levels.Neutral);
+        ActivateTerrain(_GameState.Neutral);
         terrainGenerated = true;
     }
 

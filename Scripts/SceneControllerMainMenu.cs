@@ -8,7 +8,7 @@ public class SceneControllerMainMenu : MonoBehaviour {
     public void Lobby()
     {
         CrossPlatformInputManager.SetButtonUp("Lobby");
-        SetupManager.activeTerrain = _Levels.Neutral;
+        GameManager.activeTerrain = _GameState.Neutral;
         SceneManager.LoadScene(_Scenes.sceneLobby);
     }
 }
