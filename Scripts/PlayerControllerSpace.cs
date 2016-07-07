@@ -14,12 +14,12 @@ public class PlayerControllerSpace : NetworkBehaviour {
     private Vector3 inputVector;
     private float targetAngle;
     private Rigidbody2D rigidBody2D;
-    private BarrierIndicatorManager barrierIndicatorManager;
+    private PlayerBarrier playerBarrier;
 
     void Awake ()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
-        barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
+        playerBarrier = GetComponent<PlayerBarrier>();
     }
 
 
@@ -53,14 +53,6 @@ public class PlayerControllerSpace : NetworkBehaviour {
                 newPos.z = 0f;
                 transform.position = newPos;
             }
-
-            //Enable Barrier Indicator
-            barrierIndicatorManager.EnableIndicator();
-        }
-        else
-        {
-            //Disable Barrier Indicator
-            barrierIndicatorManager.DisableIndicator();
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }

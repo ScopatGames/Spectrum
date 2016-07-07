@@ -2,7 +2,6 @@
 
 public class SmoothCameraPlanet : MonoBehaviour {
     public float lagTime = 12f;
-    [HideInInspector]
     public Transform player;
     public float rotateSpeed = 10;
     public float radialOffset = 8;
@@ -21,14 +20,13 @@ public class SmoothCameraPlanet : MonoBehaviour {
         {
             from = transform.position;
             cachedMagnitude = player.position.magnitude;
-            to = player.position*(cachedMagnitude-radialOffset)/cachedMagnitude;
+            to = player.position * (cachedMagnitude - radialOffset) / cachedMagnitude;
             to.z = transform.position.z;
             transform.position -= (from - to) * lagTime * Time.deltaTime;
 
             targetAngle = Mathf.Rad2Deg * Mathf.Atan2(-transform.position.x, transform.position.y);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
         }
-
         newPos = new Vector3(transform.position.x, transform.position.y, 0f);
        
         if (newPos.sqrMagnitude > upperBoundary * upperBoundary)

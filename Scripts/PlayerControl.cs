@@ -3,13 +3,18 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour {
 
+    public int spaceBoundaryRadius = 45;
+    public int planetBoundaryRadius = 80;
+
     private PlayerControllerSpace playerControllerSpace;
     private PlayerControllerPlanet playerControllerPlanet;
+    private PlayerBarrier playerBarrier;
 
     void Awake()
     {
         playerControllerSpace = GetComponent<PlayerControllerSpace>();
         playerControllerPlanet = GetComponent<PlayerControllerPlanet>();
+        playerBarrier = GetComponent<PlayerBarrier>();
     }
 
     void Start()
@@ -19,6 +24,8 @@ public class PlayerControl : NetworkBehaviour {
 
     public void EnableSpaceControl()
     {
+        playerBarrier.boundaryRadius = spaceBoundaryRadius;
+
         if (isLocalPlayer)
         {
             playerControllerPlanet.enabled = false;
@@ -32,6 +39,7 @@ public class PlayerControl : NetworkBehaviour {
 
     public void EnablePlanetControl()
     {
+        playerBarrier.boundaryRadius = planetBoundaryRadius;
         if (isLocalPlayer)
         {
             playerControllerSpace.enabled = false;

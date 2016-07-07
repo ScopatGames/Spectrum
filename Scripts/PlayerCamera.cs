@@ -4,17 +4,16 @@ using UnityEngine.Networking;
 
 public class PlayerCamera : NetworkBehaviour {
 
-    public Camera mainCamera;
+    public GameObject mainCamera;
 
     private SmoothCameraPlanet smoothCameraPlanet;
     private SmoothCameraSpace smoothCameraSpace;
 
-	void Awake () {
+    void Start() {
         if (isLocalPlayer)
         {
-            smoothCameraPlanet = GetComponent<SmoothCameraPlanet>();
-            smoothCameraSpace = GetComponent<SmoothCameraSpace>();
-
+            smoothCameraPlanet = mainCamera.GetComponent<SmoothCameraPlanet>();
+            smoothCameraSpace = mainCamera.GetComponent<SmoothCameraSpace>();
             mainCamera.transform.parent = null;
             mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200f);
 
@@ -24,7 +23,7 @@ public class PlayerCamera : NetworkBehaviour {
         {
             Destroy(mainCamera);
         }
-	}
+    }
 
     public void EnableCameraSpace()
     {

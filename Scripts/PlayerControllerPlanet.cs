@@ -23,13 +23,13 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private float thrustFactor;
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
-    private BarrierIndicatorManager barrierIndicatorManager;
+    private PlayerBarrier playerBarrier;
 
 
     void Awake()
     {
         rigidBody2D = this.GetComponent<Rigidbody2D>();
-        barrierIndicatorManager = GetComponent<BarrierIndicatorManager>();
+        playerBarrier = GetComponent<PlayerBarrier>();
     }
 
     void FixedUpdate()
@@ -99,14 +99,6 @@ public class PlayerControllerPlanet : NetworkBehaviour
                 newPos.z = 0f;
                 transform.position = newPos;
             }
-
-            //Enable Indicator
-            barrierIndicatorManager.EnableIndicator();
-        }
-        else
-        {
-            //Disable Indicator
-            barrierIndicatorManager.DisableIndicator();
         }
         ////////////END BOUNDARY CONTROL/////////////////
     }
