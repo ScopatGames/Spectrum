@@ -14,12 +14,10 @@ public class PlayerControllerSpace : NetworkBehaviour {
     private Vector3 inputVector;
     private float targetAngle;
     private Rigidbody2D rigidBody2D;
-    private PlayerBarrier playerBarrier;
 
     void Awake ()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
-        playerBarrier = GetComponent<PlayerBarrier>();
     }
 
 

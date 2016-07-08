@@ -23,13 +23,10 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private float thrustFactor;
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
-    private PlayerBarrier playerBarrier;
-
 
     void Awake()
     {
         rigidBody2D = this.GetComponent<Rigidbody2D>();
-        playerBarrier = GetComponent<PlayerBarrier>();
     }
 
     void FixedUpdate()

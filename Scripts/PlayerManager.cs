@@ -9,6 +9,7 @@ public class PlayerManager {
     public int playerNumber;
     public GameObject instance;
     public string playerName;
+    public int randomTerrainSeed;
 
     public PlayerSetup playerSetup;
     public PlayerControl playerControl;
@@ -25,7 +26,13 @@ public class PlayerManager {
         playerSetup.colorIndex = playerColorIndex;
         playerSetup.playerName = playerName;
         playerSetup.playerNumber = playerNumber;
+        playerSetup.randomTerrainSeed = GenerateRandomTerrainSeed();
 
+    }
+
+    public int GenerateRandomTerrainSeed()
+    {
+        return (new System.Random()).Next(0, 1024);
     }
 
     public void PlayerStateChange(_GameState gameState)

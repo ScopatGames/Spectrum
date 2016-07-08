@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class GameManager : NetworkBehaviour {
+public class GameManager : MonoBehaviour {
 
     static public GameManager instance;
     static public List<PlayerManager> playerManagers = new List<PlayerManager>();
+    static public System.Random randomSeedGenerator = new System.Random();
 
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
     public TextAsset textInputFaces;
     public float terrainScale = 40.0f;
     public List<GameObject> terrainTilePrefab = new List<GameObject>();
-    public GameObject playerTerrainPrefab;
 
     static public _GameState activeTerrain;
     [HideInInspector]
@@ -34,13 +34,9 @@ public class GameManager : NetworkBehaviour {
     public Dictionary<string, Color>[] playerColorDictionaries = new Dictionary<string, Color>[2];
 
     private ColorDictionary colorDictionary;
-    [SyncVar]
-    public int playerOneColorIndex;
-    [SyncVar]
-    public int playerTwoColorIndex;
 
     // [ServerCallback]
-    void Awake()
+    void Start()
     {
         //Singleton
         instance = this;
@@ -55,6 +51,8 @@ public class GameManager : NetworkBehaviour {
         //parse face and vertex data from input files
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
+
+        RegenerateTerrain();
     }
 
     //PUBLIC METHODS
@@ -85,6 +83,7 @@ public class GameManager : NetworkBehaviour {
         tempPlayer.playerNumber = playerNum;
         tempPlayer.playerColorIndex = playerColorIndex;
         tempPlayer.playerName = name;
+        tempPlayer.randomTerrainSeed = randomSeedGenerator.Next(0, 1024);
         tempPlayer.Setup();
 
         playerManagers.Add(tempPlayer);
@@ -93,15 +92,15 @@ public class GameManager : NetworkBehaviour {
     public void AssignPlayerColors()
     {
         //Assign color enums
-        playerOneColor = (_Colors)playerOneColorIndex;
-        playerTwoColor = (_Colors)playerTwoColorIndex;
+        playerOneColor = (_Colors)playerManagers[0].playerColorIndex;
+        playerTwoColor = (_Colors)playerManagers[1].playerColorIndex;
 
         //Assign color sub-dictionaries to each player
         playerColorDictionaries[0] = colorDictionary.GetColorDictionary(playerOneColor.ToString());
         playerColorDictionaries[1] = colorDictionary.GetColorDictionary(playerTwoColor.ToString());
     }
 
-    public void PickRandomColors()
+    /*public void PickRandomColors()
     {
         int colorCount = System.Enum.GetNames(typeof(_Colors)).Length;
         System.Random rnd = new System.Random();
@@ -111,7 +110,7 @@ public class GameManager : NetworkBehaviour {
         {
             playerTwoColorIndex = rnd.Next(0, colorCount);
         }
-    }
+    }*/
 
     public void RegenerateTerrain()
     {
@@ -127,22 +126,22 @@ public class GameManager : NetworkBehaviour {
         }
 
         //Pick colors
-        PickRandomColors();
+        //PickRandomColors();
         AssignPlayerColors();
 
         //Assign color to terrain tiles
         AssignColorToTerrainTiles();
 
         //parse vertices data from input file, scale, and randomize for each player
-        playerTerrainVertices = RandomizeVertices(parsedTerrainVertices);
+        playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
 
         //Generate player one and player two terrains
         for (int i = 0; i < 2; i++)
         {
             //Create the current player terrain tile container
-            playerTerrains.Add((GameObject)Instantiate(playerTerrainPrefab, Vector3.zero, Quaternion.identity));
+            playerTerrains.Add((GameObject)Instantiate(new GameObject(), Vector3.zero, Quaternion.identity));
             //Rename the terrain container to match current player
-            playerTerrains[i].name = (i + 1).ToString();
+            playerTerrains[i].name = "Terrain" + (i + 1).ToString();
             //Set parent to the SetupManager GameObject and disable it
             playerTerrains[i].transform.parent = transform;
             //Create terrain tiles for the current player
@@ -313,20 +312,20 @@ public class GameManager : NetworkBehaviour {
         return parsedTerrainVertices;
     }
 
-    private List<Vector3>[] RandomizeVertices(List<Vector3> parsedTerrainVertices)
+    private List<Vector3>[] PseudoRandomizeVertices(List<Vector3> parsedTerrainVertices)
     {
         //This method parses the vertices, scales, and randomizes them for each player
         playerTerrainVertices = new List<Vector3>[2];
 
         //scale and randomize vertex data
-        float randomScaleFactor;
+        float perlinNoiseFactor;
         for (int i = 0; i < 2; i++)
         {
             playerTerrainVertices[i] = new List<Vector3>();
             for (int j = 0; j < parsedTerrainVertices.Count; j++)
             {
-                randomScaleFactor = UnityEngine.Random.Range(1.0f, 1.1f);
-                playerTerrainVertices[i].Add(parsedTerrainVertices[j] * terrainScale * randomScaleFactor);
+                perlinNoiseFactor = 1f + 0.11f*Mathf.PerlinNoise(0.99f * j, playerManagers[i].randomTerrainSeed*0.99f);
+                playerTerrainVertices[i].Add(parsedTerrainVertices[j] * terrainScale * perlinNoiseFactor);
             }
         }
         return playerTerrainVertices;

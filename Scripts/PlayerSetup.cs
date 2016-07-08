@@ -18,6 +18,9 @@ public class PlayerSetup : NetworkBehaviour {
     [SyncVar]
     public bool isReady = false;
 
+    [SyncVar]
+    public int randomTerrainSeed;
+
 
     public TextAsset colorList;
     private Dictionary<string, Color> playerColors;
