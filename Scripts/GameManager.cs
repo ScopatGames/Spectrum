@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Networking;
+using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
@@ -52,6 +53,16 @@ public class GameManager : MonoBehaviour {
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
+        StartCoroutine("RegenerateTerrainCoroutine");
+    
+    }
+
+    IEnumerator RegenerateTerrainCoroutine()
+    {
+        while (playerManagers.Count < 2)
+        {
+            yield return null;
+        }
         RegenerateTerrain();
     }
 
@@ -181,6 +192,7 @@ public class GameManager : MonoBehaviour {
     {
         Vector3 tilePosition;
         float tileDepth;
+        float perlinNoiseFactor;
         int numVertices;
 
         for (int i = 0; i < parsedTerrainFaces.Count; i++)
@@ -189,8 +201,9 @@ public class GameManager : MonoBehaviour {
             numVertices = (parsedTerrainFaces[i][3] == -1) ? 3 : 4;
 
             //Calculate a random tile depth
-            tileDepth = (numVertices == 3) ? UnityEngine.Random.Range(0.4f, 0.8f) * terrainScale / 10f : UnityEngine.Random.Range(1.0f, 1.4f) * terrainScale / 10f;
-            if (UnityEngine.Random.Range(0f, 1f) < 0.5f)
+            perlinNoiseFactor = Mathf.PerlinNoise(playerManagers[terrainIndex].randomTerrainSeed * 0.99f, i * 9.99f);
+            tileDepth = (numVertices == 3) ? (perlinNoiseFactor*0.4f+0.4f) * terrainScale / 10f : (perlinNoiseFactor*0.4f+1f) * terrainScale / 10f;
+            if (Mathf.PerlinNoise(i*9.99f, perlinNoiseFactor) < 0.5f)
             {
                 tileDepth *= -1f;
             }
