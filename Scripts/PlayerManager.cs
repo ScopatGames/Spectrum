@@ -39,34 +39,43 @@ public class PlayerManager {
     {
         switch (gameState)
         {
-            case _GameState.Lobby:
-            case _GameState.MainMenu:
-                playerSetup.DisableAllGraphics();
-                break;
-
             case _GameState.Neutral:
                 playerSetup.EnableSpaceGraphics();
+                instance.transform.position = GameManager.instance.spaceSpawnPoints[playerSetup.playerNumber].position;
+                playerControl.EnableSpaceControl();
+                playerCamera.EnableSpaceCamera();
                 break;
 
-            case _GameState.PlayerOne:
-                if (playerNumber == 0)
-                {
-                    playerSetup.EnablePlanetGraphics();
-                }
-                else
-                {
-                    playerSetup.DisableAllGraphics();
-                }
-                break;
-
-            case _GameState.PlayerTwo:
+            case _GameState.PlayerOnePlanet:
                 if (playerNumber == 1)
                 {
                     playerSetup.EnablePlanetGraphics();
+                    instance.transform.position = GameManager.instance.planetSpawnPoints[0].position;
+                    playerControl.EnablePlanetControl();
+                    playerCamera.EnablePlanetCameraAttacker();
                 }
                 else
                 {
                     playerSetup.DisableAllGraphics();
+                    playerControl.DisableAllControl();
+                    playerCamera.EnablePlanetCameraDefender();
+                    
+                }
+                break;
+
+            case _GameState.PlayerTwoPlanet:
+                if (playerNumber == 0)
+                {
+                    playerSetup.EnablePlanetGraphics();
+                    instance.transform.position = GameManager.instance.planetSpawnPoints[0].position;
+                    playerControl.EnablePlanetControl();
+                    playerCamera.EnablePlanetCameraAttacker();
+                }
+                else
+                {
+                    playerSetup.DisableAllGraphics();
+                    playerControl.DisableAllControl();
+                    playerCamera.EnablePlanetCameraDefender();
                 }
                 break;
         }

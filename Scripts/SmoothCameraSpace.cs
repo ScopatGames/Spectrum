@@ -4,7 +4,7 @@ using System.Collections;
 public class SmoothCameraSpace : MonoBehaviour {
 
 	public float lagTime = 12f;
-	public Transform player;
+	public Transform target;
     [Header("Enter the half width and height of level in world units")]
     public Vector2 levelExtents;
 
@@ -21,10 +21,10 @@ public class SmoothCameraSpace : MonoBehaviour {
 
 
 	void FixedUpdate () {
-        if (player)
+        if (target)
         {
             Vector3 from = transform.position;
-            Vector3 to = player.position;
+            Vector3 to = target.position;
             to.z = transform.position.z;
             transform.position -= (from - to) * lagTime * Time.deltaTime;
         }

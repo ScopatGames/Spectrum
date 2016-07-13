@@ -3,7 +3,7 @@
     MainMenu,
     Lobby,
     Neutral,
-    PlayerOne,
-    PlayerTwo
+    PlayerOnePlanet,
+    PlayerTwoPlanet
     
 }

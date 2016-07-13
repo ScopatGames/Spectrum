@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using System.Collections;
 
-public class GameManager : MonoBehaviour {
+public class GameManager :NetworkBehaviour {
 
     static public GameManager instance;
     static public List<PlayerManager> playerManagers = new List<PlayerManager>();
@@ -15,9 +15,6 @@ public class GameManager : MonoBehaviour {
     public float terrainScale = 40.0f;
     public List<GameObject> terrainTilePrefab = new List<GameObject>();
 
-    static public _GameState activeTerrain;
-    [HideInInspector]
-    public bool terrainGenerated = false;
     [HideInInspector]
     static public List<GameObject> playerTerrains = new List<GameObject>();
 
@@ -35,58 +32,46 @@ public class GameManager : MonoBehaviour {
     public Dictionary<string, Color>[] playerColorDictionaries = new Dictionary<string, Color>[2];
 
     private ColorDictionary colorDictionary;
+    [Header("------ Dynamic Lighting ------")]
+    public Light dynamicLight;
 
-    // [ServerCallback]
-    void Start()
+    [Header("------ Background Graphics ------")]
+    public MeshRenderer backgroundMeshRenderer;
+    public Material spaceBackgroundMaterial;
+    public Material planetBackgroundMaterial;
+    public ParticleSystem starsParticleSystem;
+
+    [Header("------ Space Battle Data ------")]
+    public List<Transform> spaceSpawnPoints = new List<Transform>();
+    public Vector3 spaceDynamicLightingRotation;
+    public float spaceDynamicLightingIntensity;
+
+    [Header("------ Planet Battle Data ------")]
+    public List<Transform> planetSpawnPoints = new List<Transform>();
+    public Vector3 planetDynamicLightingRotation;
+    public float planetDynamicLightingIntensity;
+
+    
+    void Awake()
     {
         //Singleton
         instance = this;
-        //DontDestroyOnLoad(gameObject);
-
+    }
+    
+    void Start()
+    {
         //Instantiate new color dictionary
         colorDictionary = new ColorDictionary(colorListTextAsset);
-        //playerData = GetComponent<PlayerData>();
-
-        activeTerrain = _GameState.Neutral;
 
         //parse face and vertex data from input files
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
-        StartCoroutine("RegenerateTerrainCoroutine");
-    
+        StartCoroutine("RegenerateTerrain");
     }
 
-    IEnumerator RegenerateTerrainCoroutine()
-    {
-        while (playerManagers.Count < 2)
-        {
-            yield return null;
-        }
-        RegenerateTerrain();
-    }
-
-    //PUBLIC METHODS
+    //STATIC METHODS
     //------------------------------------------------
-    static public void ActivateTerrain(_GameState gameState)
-    {
-        switch (gameState)
-        {
-            case _GameState.Neutral:
-                playerTerrains[0].SetActive(false);
-                playerTerrains[1].SetActive(false);
-                break;
-            case _GameState.PlayerOne:
-                playerTerrains[0].SetActive(true);
-                playerTerrains[1].SetActive(false);
-                break;
-            case _GameState.PlayerTwo:
-                playerTerrains[0].SetActive(false);
-                playerTerrains[1].SetActive(true);
-                break;
-        }
-    }
-
     static public void AddPlayer(GameObject player, int playerNum, int playerColorIndex, string name)
     {
         PlayerManager tempPlayer = new PlayerManager();
@@ -100,67 +85,25 @@ public class GameManager : MonoBehaviour {
         playerManagers.Add(tempPlayer);
     }
 
-    public void AssignPlayerColors()
+    //PUBLIC METHODS
+    //------------------------------------------------
+    public void ChangeGameStatePlayerOnePlanet()
     {
-        //Assign color enums
-        playerOneColor = (_Colors)playerManagers[0].playerColorIndex;
-        playerTwoColor = (_Colors)playerManagers[1].playerColorIndex;
-
-        //Assign color sub-dictionaries to each player
-        playerColorDictionaries[0] = colorDictionary.GetColorDictionary(playerOneColor.ToString());
-        playerColorDictionaries[1] = colorDictionary.GetColorDictionary(playerTwoColor.ToString());
+        RpcGameStateSetup(_GameState.PlayerOnePlanet);
     }
 
-    /*public void PickRandomColors()
+    public void ChangeGameStatePlayerTwoPlanet()
     {
-        int colorCount = System.Enum.GetNames(typeof(_Colors)).Length;
-        System.Random rnd = new System.Random();
-        playerOneColorIndex = rnd.Next(0, colorCount);
-        playerTwoColorIndex = playerOneColorIndex;
-        while (playerTwoColorIndex == playerOneColorIndex)
-        {
-            playerTwoColorIndex = rnd.Next(0, colorCount);
-        }
-    }*/
-
-    public void RegenerateTerrain()
-    {
-        //This method (re)generates randomized terrain for both players
-
-        //Clear player terrain list
-
-        if (terrainGenerated)
-        {
-            Destroy(playerTerrains[0]);
-            Destroy(playerTerrains[1]);
-            playerTerrains.Clear();
-        }
-
-        //Pick colors
-        //PickRandomColors();
-        AssignPlayerColors();
-
-        //Assign color to terrain tiles
-        AssignColorToTerrainTiles();
-
-        //parse vertices data from input file, scale, and randomize for each player
-        playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
-
-        //Generate player one and player two terrains
-        for (int i = 0; i < 2; i++)
-        {
-            //Create the current player terrain tile container
-            playerTerrains.Add((GameObject)Instantiate(new GameObject(), Vector3.zero, Quaternion.identity));
-            //Rename the terrain container to match current player
-            playerTerrains[i].name = "Terrain" + (i + 1).ToString();
-            //Set parent to the SetupManager GameObject and disable it
-            playerTerrains[i].transform.parent = transform;
-            //Create terrain tiles for the current player
-            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
-        }
-        ActivateTerrain(_GameState.Neutral);
-        terrainGenerated = true;
+        RpcGameStateSetup(_GameState.PlayerTwoPlanet);
     }
+
+    public void ChangeGameStateNeutral()
+    {
+        RpcGameStateSetup(_GameState.Neutral);
+    }
+
+
+
 
     //PRIVATE METHODS
     //--------------------------------------------------------------
@@ -175,6 +118,17 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void AssignPlayerColors()
+    {
+        //Assign color enums
+        playerOneColor = (_Colors)playerManagers[0].playerColorIndex;
+        playerTwoColor = (_Colors)playerManagers[1].playerColorIndex;
+
+        //Assign color sub-dictionaries to each player
+        playerColorDictionaries[0] = colorDictionary.GetColorDictionary(playerOneColor.ToString());
+        playerColorDictionaries[1] = colorDictionary.GetColorDictionary(playerTwoColor.ToString());
+    }
+
     private Vector3 CalculateCentroid(Vector3[] vertices)
     {
         //This script calculates the centroid (transform.position) of the quad tile
@@ -186,6 +140,59 @@ public class GameManager : MonoBehaviour {
         centroid /= vertices.Length;
 
         return centroid;
+    }
+
+    private IEnumerator GameLoop()
+    {
+        while(playerManagers.Count < 2)
+            yield return null;
+
+    }
+
+    [ClientRpc]
+    private void RpcGameStateSetup(_GameState gameState)
+    {
+        switch (gameState)
+        {
+            case _GameState.Neutral:
+                playerTerrains[0].SetActive(false);
+                playerTerrains[1].SetActive(false);
+                dynamicLight.intensity = spaceDynamicLightingIntensity;
+                dynamicLight.transform.rotation = Quaternion.Euler(spaceDynamicLightingRotation);
+                backgroundMeshRenderer.material = spaceBackgroundMaterial;
+                starsParticleSystem.Play();
+                foreach (PlayerManager pm in playerManagers)
+                {
+                    pm.PlayerStateChange(gameState);
+                }
+                break;
+            case _GameState.PlayerOnePlanet:
+                playerTerrains[0].SetActive(true);
+                playerTerrains[1].SetActive(false);
+                dynamicLight.intensity = planetDynamicLightingIntensity;
+                dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
+                backgroundMeshRenderer.material = planetBackgroundMaterial;
+                starsParticleSystem.Stop();
+                starsParticleSystem.Clear();
+                foreach (PlayerManager pm in playerManagers)
+                {
+                    pm.PlayerStateChange(gameState);
+                }
+                break;
+            case _GameState.PlayerTwoPlanet:
+                playerTerrains[0].SetActive(false);
+                playerTerrains[1].SetActive(true);
+                dynamicLight.intensity = planetDynamicLightingIntensity;
+                dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
+                backgroundMeshRenderer.material = planetBackgroundMaterial;
+                starsParticleSystem.Stop();
+                starsParticleSystem.Clear();
+                foreach (PlayerManager pm in playerManagers)
+                {
+                    pm.PlayerStateChange(gameState);
+                }
+                break;
+        }
     }
 
     private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
@@ -342,5 +349,50 @@ public class GameManager : MonoBehaviour {
             }
         }
         return playerTerrainVertices;
+    }
+
+    private IEnumerator RegenerateTerrain()
+    {
+        while (playerManagers.Count < 2)
+            yield return null;
+
+        //This method (re)generates randomized terrain for both players
+
+        //Clear player terrain list
+
+        if (playerTerrains.Count > 0)
+        {
+            Destroy(playerTerrains[0]);
+            Destroy(playerTerrains[1]);
+            playerTerrains.Clear();
+        }
+
+        AssignPlayerColors();
+
+        AssignColorToTerrainTiles();
+
+        //parse vertices data from input file, scale, and randomize for each player
+        playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
+
+        //Generate player one and player two terrains
+        for (int i = 0; i < 2; i++)
+        {
+            //Create the current player terrain tile container
+            playerTerrains.Add(new GameObject());
+            //Rename the terrain container to match current player
+            playerTerrains[i].name = "Terrain" + (i + 1).ToString();
+            //Set parent to the SetupManager GameObject and disable it
+            playerTerrains[i].transform.parent = transform;
+            //Create terrain tiles for the current player
+            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
+        }
+
+        
+
+        if (isServer)
+        {
+            RpcGameStateSetup(_GameState.Neutral);
+            StartCoroutine("GameLoop");
+        }
     }
 }

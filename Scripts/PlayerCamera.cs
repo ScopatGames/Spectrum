@@ -8,6 +8,7 @@ public class PlayerCamera : NetworkBehaviour {
 
     private SmoothCameraPlanet smoothCameraPlanet;
     private SmoothCameraSpace smoothCameraSpace;
+    private Transform otherPlayerTransform;
 
     void Start() {
         if (isLocalPlayer)
@@ -16,8 +17,7 @@ public class PlayerCamera : NetworkBehaviour {
             smoothCameraSpace = mainCamera.GetComponent<SmoothCameraSpace>();
             mainCamera.transform.parent = null;
             mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200f);
-
-            EnableCameraSpace();
+            StartCoroutine("GetOtherPlayerTransform");
         }
         else
         {
@@ -25,7 +25,7 @@ public class PlayerCamera : NetworkBehaviour {
         }
     }
 
-    public void EnableCameraSpace()
+    public void EnableSpaceCamera()
     {
         if (isLocalPlayer)
         {
@@ -34,12 +34,36 @@ public class PlayerCamera : NetworkBehaviour {
         }
     }
 
-    public void EnableCameraPlanet()
+    public void EnablePlanetCameraAttacker()
     {
         if (isLocalPlayer)
         {
             smoothCameraSpace.enabled = false;
             smoothCameraPlanet.enabled = true;
+            smoothCameraPlanet.target = transform;
+        }
+    }
+
+    public void EnablePlanetCameraDefender()
+    {
+        if (isLocalPlayer)
+        {
+            smoothCameraSpace.enabled = false;
+            smoothCameraPlanet.enabled = true;
+            smoothCameraPlanet.target = otherPlayerTransform;
+        }
+    }
+
+    private IEnumerator GetOtherPlayerTransform()
+    {
+        while (GameManager.playerManagers.Count < 2)
+            yield return null;
+
+        foreach(PlayerManager pm in GameManager.playerManagers)
+        {
+            if (pm.playerCamera != this) {
+                otherPlayerTransform = pm.playerCamera.transform;
+            }
         }
     }
 }

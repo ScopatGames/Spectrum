@@ -2,7 +2,7 @@
 
 public class SmoothCameraPlanet : MonoBehaviour {
     public float lagTime = 12f;
-    public Transform player;
+    public Transform target;
     public float rotateSpeed = 10;
     public float radialOffset = 8;
     public float upperBoundary = 75;
@@ -16,11 +16,11 @@ public class SmoothCameraPlanet : MonoBehaviour {
 
     void FixedUpdate()
     {
-        if (player)
+        if (target)
         {
             from = transform.position;
-            cachedMagnitude = player.position.magnitude;
-            to = player.position * (cachedMagnitude - radialOffset) / cachedMagnitude;
+            cachedMagnitude = target.position.magnitude;
+            to = target.position * (cachedMagnitude - radialOffset) / cachedMagnitude;
             to.z = transform.position.z;
             transform.position -= (from - to) * lagTime * Time.deltaTime;
 

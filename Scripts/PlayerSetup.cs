@@ -60,7 +60,6 @@ public class PlayerSetup : NetworkBehaviour {
         meshRendererPlanet.material.color = playerColors[_ColorType.PlayerShipPlanet.ToString()];
         meshRendererSpace.material.color = playerColors[_ColorType.PlayerShipSpace.ToString()];
 
-        EnableSpaceGraphics();
     }
 
     public void EnableSpaceGraphics()

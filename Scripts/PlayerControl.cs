@@ -17,11 +17,6 @@ public class PlayerControl : NetworkBehaviour {
         playerBarrier = GetComponent<PlayerBarrier>();
     }
 
-    void Start()
-    {
-        EnableSpaceControl();
-    }
-
     public void EnableSpaceControl()
     {
         playerBarrier.boundaryRadius = spaceBoundaryRadius;
