@@ -16,7 +16,7 @@ public class SmoothCameraPlanet : MonoBehaviour {
 
     void FixedUpdate()
     {
-        if (target)
+        if (target != null)
         {
             from = transform.position;
             cachedMagnitude = target.position.magnitude;

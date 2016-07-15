@@ -26,7 +26,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
 
     void Awake()
     {
-        rigidBody2D = this.GetComponent<Rigidbody2D>();
+        rigidBody2D = GetComponent<Rigidbody2D>();
     }
 
     void FixedUpdate()
@@ -81,23 +81,26 @@ public class PlayerControllerPlanet : NetworkBehaviour
 
             //Update player rotation
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
-            //Update roll rotation
-            childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
-        }
-        ///////////BOUNDARY CONTROL/////////////
-        //Check to see if player is within playable boundary and update if necessary:
+            
 
-        Vector3 newPos;
-        if (transform.position.sqrMagnitude > outerBoundaryRadius * outerBoundaryRadius)
-        {
-            if (isLocalPlayer)
+            ///////////BOUNDARY CONTROL/////////////
+            //Check to see if player is within playable boundary and update if necessary:
+
+            Vector3 newPos;
+            if (transform.position.sqrMagnitude > outerBoundaryRadius * outerBoundaryRadius)
             {
-                newPos = transform.position.normalized * outerBoundaryRadius;
-                newPos.z = 0f;
-                transform.position = newPos;
+                if (isLocalPlayer)
+                {
+                    newPos = transform.position.normalized * outerBoundaryRadius;
+                    newPos.z = 0f;
+                    transform.position = newPos;
+                }
             }
+            ////////////END BOUNDARY CONTROL/////////////////
         }
-        ////////////END BOUNDARY CONTROL/////////////////
+
+        //Update roll rotation
+        childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
     }
 
     void Update()

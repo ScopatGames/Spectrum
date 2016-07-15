@@ -14,9 +14,12 @@ public class PlayerCamera : NetworkBehaviour {
         if (isLocalPlayer)
         {
             smoothCameraPlanet = mainCamera.GetComponent<SmoothCameraPlanet>();
+            smoothCameraPlanet.target = null;
             smoothCameraSpace = mainCamera.GetComponent<SmoothCameraSpace>();
+            smoothCameraSpace.target = null;
             mainCamera.transform.parent = null;
             mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200f);
+            mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
             StartCoroutine("GetOtherPlayerTransform");
         }
         else
@@ -31,6 +34,7 @@ public class PlayerCamera : NetworkBehaviour {
         {
             smoothCameraPlanet.enabled = false;
             smoothCameraSpace.enabled = true;
+            smoothCameraSpace.target = transform;
         }
     }
 

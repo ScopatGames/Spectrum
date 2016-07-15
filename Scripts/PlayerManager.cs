@@ -26,7 +26,7 @@ public class PlayerManager {
         playerSetup.colorIndex = playerColorIndex;
         playerSetup.playerName = playerName;
         playerSetup.playerNumber = playerNumber;
-        playerSetup.randomTerrainSeed = GenerateRandomTerrainSeed();
+        playerSetup.randomTerrainSeed = randomTerrainSeed;
 
     }
 
@@ -57,7 +57,7 @@ public class PlayerManager {
                 else
                 {
                     playerSetup.DisableAllGraphics();
-                    playerControl.DisableAllControl();
+                    playerControl.DisableAllControl(); 
                     playerCamera.EnablePlanetCameraDefender();
                     
                 }
@@ -74,7 +74,7 @@ public class PlayerManager {
                 else
                 {
                     playerSetup.DisableAllGraphics();
-                    playerControl.DisableAllControl();
+                    playerControl.DisableAllControl(); 
                     playerCamera.EnablePlanetCameraDefender();
                 }
                 break;

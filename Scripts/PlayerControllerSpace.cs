@@ -15,11 +15,10 @@ public class PlayerControllerSpace : NetworkBehaviour {
     private float targetAngle;
     private Rigidbody2D rigidBody2D;
 
-    void Awake ()
+    void Awake()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
     }
-
 
     void FixedUpdate()
     {
@@ -38,21 +37,22 @@ public class PlayerControllerSpace : NetworkBehaviour {
                 targetAngle = Mathf.Rad2Deg * Mathf.Atan2(-inputVector.x, inputVector.y);
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, 0f, targetAngle), rotateSpeed * Time.deltaTime);
             }
-        }
 
-        ///////////BOUNDARY CONTROL/////////////
-        //Check to see if player is within playable boundary and update if necessary:
-        Vector3 newPos;
-        if (transform.position.sqrMagnitude > boundaryRadius * boundaryRadius)
-        {
-            if (isLocalPlayer)
+
+            ///////////BOUNDARY CONTROL/////////////
+            //Check to see if player is within playable boundary and update if necessary:
+            Vector3 newPos;
+            if (transform.position.sqrMagnitude > boundaryRadius * boundaryRadius)
             {
-                newPos = transform.position.normalized * boundaryRadius;
-                newPos.z = 0f;
-                transform.position = newPos;
+                if (isLocalPlayer)
+                {
+                    newPos = transform.position.normalized * boundaryRadius;
+                    newPos.z = 0f;
+                    transform.position = newPos;
+                }
             }
+            ////////////END BOUNDARY CONTROL/////////////////
         }
-        ////////////END BOUNDARY CONTROL/////////////////
     }
 
 

@@ -51,7 +51,6 @@ public class GameManager :NetworkBehaviour {
     public Vector3 planetDynamicLightingRotation;
     public float planetDynamicLightingIntensity;
 
-    
     void Awake()
     {
         //Singleton
@@ -67,19 +66,20 @@ public class GameManager :NetworkBehaviour {
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
+        StartCoroutine("InitiateGameStateNeutral");
         StartCoroutine("RegenerateTerrain");
     }
 
     //STATIC METHODS
     //------------------------------------------------
-    static public void AddPlayer(GameObject player, int playerNum, int playerColorIndex, string name)
+    static public void AddPlayer(GameObject player, int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
     {
         PlayerManager tempPlayer = new PlayerManager();
         tempPlayer.instance = player;
         tempPlayer.playerNumber = playerNum;
         tempPlayer.playerColorIndex = playerColorIndex;
         tempPlayer.playerName = name;
-        tempPlayer.randomTerrainSeed = randomSeedGenerator.Next(0, 1024);
+        tempPlayer.randomTerrainSeed = randomTerrainSeed;
         tempPlayer.Setup();
 
         playerManagers.Add(tempPlayer);
@@ -149,52 +149,58 @@ public class GameManager :NetworkBehaviour {
 
     }
 
-    [ClientRpc]
-    private void RpcGameStateSetup(_GameState gameState)
+    private void GameStateNeutral()
     {
-        switch (gameState)
+        if (playerTerrains.Count == 2)
         {
-            case _GameState.Neutral:
-                playerTerrains[0].SetActive(false);
-                playerTerrains[1].SetActive(false);
-                dynamicLight.intensity = spaceDynamicLightingIntensity;
-                dynamicLight.transform.rotation = Quaternion.Euler(spaceDynamicLightingRotation);
-                backgroundMeshRenderer.material = spaceBackgroundMaterial;
-                starsParticleSystem.Play();
-                foreach (PlayerManager pm in playerManagers)
-                {
-                    pm.PlayerStateChange(gameState);
-                }
-                break;
-            case _GameState.PlayerOnePlanet:
-                playerTerrains[0].SetActive(true);
-                playerTerrains[1].SetActive(false);
-                dynamicLight.intensity = planetDynamicLightingIntensity;
-                dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
-                backgroundMeshRenderer.material = planetBackgroundMaterial;
-                starsParticleSystem.Stop();
-                starsParticleSystem.Clear();
-                foreach (PlayerManager pm in playerManagers)
-                {
-                    pm.PlayerStateChange(gameState);
-                }
-                break;
-            case _GameState.PlayerTwoPlanet:
-                playerTerrains[0].SetActive(false);
-                playerTerrains[1].SetActive(true);
-                dynamicLight.intensity = planetDynamicLightingIntensity;
-                dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
-                backgroundMeshRenderer.material = planetBackgroundMaterial;
-                starsParticleSystem.Stop();
-                starsParticleSystem.Clear();
-                foreach (PlayerManager pm in playerManagers)
-                {
-                    pm.PlayerStateChange(gameState);
-                }
-                break;
+            playerTerrains[0].SetActive(false);
+            playerTerrains[1].SetActive(false);
+        }
+        dynamicLight.intensity = spaceDynamicLightingIntensity;
+        dynamicLight.transform.rotation = Quaternion.Euler(spaceDynamicLightingRotation);
+        backgroundMeshRenderer.material = spaceBackgroundMaterial;
+        starsParticleSystem.Play();
+        foreach (PlayerManager pm in playerManagers)
+        {
+            pm.PlayerStateChange(_GameState.Neutral);
         }
     }
 
+    private void GameStatePlayerOnePlanet()
+    {
+        if (playerTerrains.Count == 2)
+        {
+            playerTerrains[0].SetActive(true);
+            playerTerrains[1].SetActive(false);
+        }
+        dynamicLight.intensity = planetDynamicLightingIntensity;
+        dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
+        backgroundMeshRenderer.material = planetBackgroundMaterial;
+        starsParticleSystem.Stop();
+        starsParticleSystem.Clear();
+        foreach (PlayerManager pm in playerManagers)
+        {
+            pm.PlayerStateChange(_GameState.PlayerOnePlanet);
+        }
+    }
+
+    private void GameStatePlayerTwoPlanet()
+    {
+        if (playerTerrains.Count == 2)
+        {
+            playerTerrains[0].SetActive(false);
+            playerTerrains[1].SetActive(true);
+        }
+        dynamicLight.intensity = planetDynamicLightingIntensity;
+        dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
+        backgroundMeshRenderer.material = planetBackgroundMaterial;
+        starsParticleSystem.Stop();
+        starsParticleSystem.Clear();
+        foreach (PlayerManager pm in playerManagers)
+        {
+            pm.PlayerStateChange(_GameState.PlayerTwoPlanet);
+        }
+    }
     private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
     {
         Vector3 tilePosition;
@@ -302,6 +308,19 @@ public class GameManager :NetworkBehaviour {
         mesh.RecalculateNormals();
     }
 
+    private IEnumerator InitiateGameStateNeutral()
+    {
+        while (playerManagers.Count < 2)
+        {
+            yield return null;
+        }
+
+        //wait a frame to let all the player components initialize
+        yield return null;
+
+        GameStateNeutral();
+    }
+
     private List<Vector4> ParseFaces(TextAsset textInputFaces)
     {
         //This method parses the faces' vertex pointers from the input file
@@ -385,14 +404,31 @@ public class GameManager :NetworkBehaviour {
             playerTerrains[i].transform.parent = transform;
             //Create terrain tiles for the current player
             GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
+            playerTerrains[i].SetActive(false);
         }
-
-        
 
         if (isServer)
         {
-            RpcGameStateSetup(_GameState.Neutral);
             StartCoroutine("GameLoop");
+        }
+    }
+
+    
+
+    [ClientRpc]
+    private void RpcGameStateSetup(_GameState gameState)
+    {
+        switch (gameState)
+        {
+            case _GameState.Neutral:
+                GameStateNeutral();
+                break;
+            case _GameState.PlayerOnePlanet:
+                GameStatePlayerOnePlanet();
+                break;
+            case _GameState.PlayerTwoPlanet:
+                GameStatePlayerTwoPlanet();
+                break;
         }
     }
 }

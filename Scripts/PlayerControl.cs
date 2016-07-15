@@ -20,31 +20,15 @@ public class PlayerControl : NetworkBehaviour {
     public void EnableSpaceControl()
     {
         playerBarrier.boundaryRadius = spaceBoundaryRadius;
-
-        if (isLocalPlayer)
-        {
-            playerControllerPlanet.enabled = false;
-            playerControllerSpace.enabled = true;
-        }
-        else
-        {
-            DisableAllControl();
-        }
+        playerControllerPlanet.enabled = false;
+        playerControllerSpace.enabled = true;
     }
 
     public void EnablePlanetControl()
     {
         playerBarrier.boundaryRadius = planetBoundaryRadius;
-        if (isLocalPlayer)
-        {
-            playerControllerSpace.enabled = false;
-            playerControllerPlanet.enabled = true;
-        }
-        else
-        {
-            DisableAllControl();
-        }
-        
+        playerControllerSpace.enabled = false;
+        playerControllerPlanet.enabled = true;
     }
 
     public void DisableAllControl()

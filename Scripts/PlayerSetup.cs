@@ -41,7 +41,7 @@ public class PlayerSetup : NetworkBehaviour {
 
         if (!isServer)
         {
-            GameManager.AddPlayer(gameObject, playerNumber, colorIndex, playerName);
+            GameManager.AddPlayer(gameObject, playerNumber, colorIndex, playerName, randomTerrainSeed);
         }
 
         //get player colors
@@ -95,7 +95,5 @@ public class PlayerSetup : NetworkBehaviour {
         planetCollider.enabled = false;
         spaceCollider.enabled = false;
     }
-
-
 
 }

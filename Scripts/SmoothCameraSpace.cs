@@ -15,13 +15,13 @@ public class SmoothCameraSpace : MonoBehaviour {
     void Start()
     {
         cam = GetComponent<Camera>();
-        Vector3 cameraWorldPointZeroZero = cam.ScreenToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 cameraWorldPointZeroZero = cam.ScreenToWorldPoint(new Vector3(0, 0, -200));
         cameraExtents = new Vector2(levelExtents[0] - Mathf.Abs(cameraWorldPointZeroZero.x - transform.position.x), levelExtents[1] - Mathf.Abs(cameraWorldPointZeroZero.y - transform.position.y));
     }
 
 
 	void FixedUpdate () {
-        if (target)
+        if (target != null)
         {
             Vector3 from = transform.position;
             Vector3 to = target.position;
