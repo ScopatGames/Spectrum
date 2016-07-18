@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class _Scenes : MonoBehaviour {
+public class _Scenes {
 
     public const string sceneBattleSpace = "sceneBattleSpace";
     public const string sceneBattlePlanet = "sceneBattlePlanet";

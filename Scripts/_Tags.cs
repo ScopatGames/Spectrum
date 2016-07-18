@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class _Tags : MonoBehaviour {
+public class _Tags {
 
     public const string mainCamera = "MainCamera";
     public const string playerOne = "PlayerOne";

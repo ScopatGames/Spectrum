@@ -35,6 +35,8 @@ public class PlayerCamera : NetworkBehaviour {
             smoothCameraPlanet.enabled = false;
             smoothCameraSpace.enabled = true;
             smoothCameraSpace.target = transform;
+            mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200);
+            mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
         }
     }
 
