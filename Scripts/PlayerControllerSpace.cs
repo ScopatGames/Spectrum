@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
@@ -19,12 +20,11 @@ public class PlayerControllerSpace : NetworkBehaviour {
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
     }
-
+   
     void FixedUpdate()
     {
         if (isLocalPlayer)
         {
-
             inputVector = Vector3.ClampMagnitude(new Vector3(CrossPlatformInputManager.GetAxis("Horizontal"), CrossPlatformInputManager.GetAxis("Vertical"), 0.0f), 1.0f);
 
             if (inputVector.sqrMagnitude > 0.01)

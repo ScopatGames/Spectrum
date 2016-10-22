@@ -9,6 +9,9 @@ public class GameManager :NetworkBehaviour {
     static public List<PlayerManager> playerManagers = new List<PlayerManager>();
     static public System.Random randomSeedGenerator = new System.Random();
 
+    [Header("Number of players:")]
+    public int numberOfPlayers;
+
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
     public TextAsset textInputFaces;
@@ -25,8 +28,6 @@ public class GameManager :NetworkBehaviour {
     [Header("------ Player Data ------")]
     public TextAsset colorListTextAsset;
     public bool randomColors = true;
-    public _Colors playerOneColor = _Colors.Black;
-    public _Colors playerTwoColor = _Colors.Black;
 
     [HideInInspector]
     public Dictionary<string, Color>[] playerColorDictionaries = new Dictionary<string, Color>[2];
@@ -66,7 +67,14 @@ public class GameManager :NetworkBehaviour {
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
-        StartCoroutine("InitiateGameStateNeutral");
+        if (numberOfPlayers > 1)
+        {
+            StartCoroutine("InitiateGameStateMultiNeutral");
+        }
+        else
+        {
+
+        }
         StartCoroutine("RegenerateTerrain");
     }
 
@@ -85,22 +93,33 @@ public class GameManager :NetworkBehaviour {
         playerManagers.Add(tempPlayer);
     }
 
-    //PUBLIC METHODS
+    //PUBLIC METHODS -- Currently called from GUI buttons
     //------------------------------------------------
-    public void ChangeGameStatePlayerOnePlanet()
+    public void ChangeGameStateMultiPlayerOnePlanet()
     {
-        RpcGameStateSetup(_GameState.PlayerOnePlanet);
+        RpcGameStateSetup(_GameState.MultiPlayerOnePlanet);
     }
 
-    public void ChangeGameStatePlayerTwoPlanet()
+    public void ChangeGameStateMultiPlayerTwoPlanet()
     {
-        RpcGameStateSetup(_GameState.PlayerTwoPlanet);
+        RpcGameStateSetup(_GameState.MultiPlayerTwoPlanet);
     }
 
-    public void ChangeGameStateNeutral()
+    public void ChangeGameStateMultiNeutral()
     {
-        RpcGameStateSetup(_GameState.Neutral);
+        RpcGameStateSetup(_GameState.MultiNeutral);
     }
+
+    public void ChangeGameStateSinglePlanet()
+    {
+        GameStateSetup(_GameState.SinglePlanet);
+    }
+
+    public void ChangeGameStateSingleNeutral()
+    {
+        GameStateSetup(_GameState.SingleNeutral);
+    }
+
 
 
 
@@ -110,7 +129,7 @@ public class GameManager :NetworkBehaviour {
     private void AssignColorToTerrainTiles()
     {
         MeshRenderer mR;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < numberOfPlayers; i++)
         {
             mR = terrainTilePrefab[i].GetComponent<MeshRenderer>();
             mR.sharedMaterial.SetColor("_Color", playerColorDictionaries[i][_ColorType.BaseMain.ToString()]);
@@ -120,13 +139,11 @@ public class GameManager :NetworkBehaviour {
 
     private void AssignPlayerColors()
     {
-        //Assign color enums
-        playerOneColor = (_Colors)playerManagers[0].playerColorIndex;
-        playerTwoColor = (_Colors)playerManagers[1].playerColorIndex;
-
-        //Assign color sub-dictionaries to each player
-        playerColorDictionaries[0] = colorDictionary.GetColorDictionary(playerOneColor.ToString());
-        playerColorDictionaries[1] = colorDictionary.GetColorDictionary(playerTwoColor.ToString());
+        //Assign color sub-dictionaries to each player. This is still applicable to single player, hence looping through 2
+        for (int i = 0; i < 2; i++)
+        {
+            playerColorDictionaries[i] = colorDictionary.GetColorDictionary(((_Colors)playerManagers[i].playerColorIndex).ToString());
+        }
     }
 
     private Vector3 CalculateCentroid(Vector3[] vertices)
@@ -144,12 +161,12 @@ public class GameManager :NetworkBehaviour {
 
     private IEnumerator GameLoop()
     {
-        while(playerManagers.Count < 2)
+        while(playerManagers.Count < numberOfPlayers)
             yield return null;
 
     }
 
-    private void GameStateNeutral()
+    private void GameStateMultiNeutral()
     {
         if (playerTerrains.Count == 2)
         {
@@ -162,11 +179,11 @@ public class GameManager :NetworkBehaviour {
         starsParticleSystem.Play();
         foreach (PlayerManager pm in playerManagers)
         {
-            pm.PlayerStateChange(_GameState.Neutral);
+            pm.PlayerStateChange(_GameState.MultiNeutral);
         }
     }
 
-    private void GameStatePlayerOnePlanet()
+    private void GameStateMultiPlayerOnePlanet()
     {
         if (playerTerrains.Count == 2)
         {
@@ -180,11 +197,11 @@ public class GameManager :NetworkBehaviour {
         starsParticleSystem.Clear();
         foreach (PlayerManager pm in playerManagers)
         {
-            pm.PlayerStateChange(_GameState.PlayerOnePlanet);
+            pm.PlayerStateChange(_GameState.MultiPlayerOnePlanet);
         }
     }
 
-    private void GameStatePlayerTwoPlanet()
+    private void GameStateMultiPlayerTwoPlanet()
     {
         if (playerTerrains.Count == 2)
         {
@@ -198,9 +215,14 @@ public class GameManager :NetworkBehaviour {
         starsParticleSystem.Clear();
         foreach (PlayerManager pm in playerManagers)
         {
-            pm.PlayerStateChange(_GameState.PlayerTwoPlanet);
+            pm.PlayerStateChange(_GameState.MultiPlayerTwoPlanet);
         }
     }
+
+    private void GameStateSingleNeutral() { }
+
+    private void GameStateSinglePlanet() { }
+
     private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
     {
         Vector3 tilePosition;
@@ -308,9 +330,9 @@ public class GameManager :NetworkBehaviour {
         mesh.RecalculateNormals();
     }
 
-    private IEnumerator InitiateGameStateNeutral()
+    private IEnumerator InitiateGameStateMultiNeutral()
     {
-        while (playerManagers.Count < 2)
+        while (playerManagers.Count < numberOfPlayers)
         {
             yield return null;
         }
@@ -318,7 +340,7 @@ public class GameManager :NetworkBehaviour {
         //wait a frame to let all the player components initialize
         yield return null;
 
-        GameStateNeutral();
+        GameStateMultiNeutral();
     }
 
     private List<Vector4> ParseFaces(TextAsset textInputFaces)
@@ -358,7 +380,7 @@ public class GameManager :NetworkBehaviour {
 
         //scale and randomize vertex data
         float perlinNoiseFactor;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < numberOfPlayers; i++)
         {
             playerTerrainVertices[i] = new List<Vector3>();
             for (int j = 0; j < parsedTerrainVertices.Count; j++)
@@ -372,7 +394,7 @@ public class GameManager :NetworkBehaviour {
 
     private IEnumerator RegenerateTerrain()
     {
-        while (playerManagers.Count < 2)
+        while (playerManagers.Count < numberOfPlayers)
             yield return null;
 
         //This method (re)generates randomized terrain for both players
@@ -381,8 +403,10 @@ public class GameManager :NetworkBehaviour {
 
         if (playerTerrains.Count > 0)
         {
-            Destroy(playerTerrains[0]);
-            Destroy(playerTerrains[1]);
+            for (int i = 0; i < playerTerrains.Count; i++)
+            {
+                Destroy(playerTerrains[i]);
+            }
             playerTerrains.Clear();
         }
 
@@ -394,7 +418,7 @@ public class GameManager :NetworkBehaviour {
         playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
 
         //Generate player one and player two terrains
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < numberOfPlayers; i++)
         {
             //Create the current player terrain tile container
             playerTerrains.Add(new GameObject());
@@ -420,14 +444,27 @@ public class GameManager :NetworkBehaviour {
     {
         switch (gameState)
         {
-            case _GameState.Neutral:
-                GameStateNeutral();
+            case _GameState.MultiNeutral:
+                GameStateMultiNeutral();
                 break;
-            case _GameState.PlayerOnePlanet:
-                GameStatePlayerOnePlanet();
+            case _GameState.MultiPlayerOnePlanet:
+                GameStateMultiPlayerOnePlanet();
                 break;
-            case _GameState.PlayerTwoPlanet:
-                GameStatePlayerTwoPlanet();
+            case _GameState.MultiPlayerTwoPlanet:
+                GameStateMultiPlayerTwoPlanet();
+                break;
+        }
+    }
+
+    private void GameStateSetup(_GameState gameState)
+    {
+        switch (gameState)
+        {
+            case _GameState.SingleNeutral:
+                GameStateSingleNeutral();
+                break;
+            case _GameState.SinglePlanet:
+                GameStateSinglePlanet();
                 break;
         }
     }

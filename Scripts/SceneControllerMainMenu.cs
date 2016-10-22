@@ -10,4 +10,11 @@ public class SceneControllerMainMenu : MonoBehaviour {
         CrossPlatformInputManager.SetButtonUp("Lobby");
         SceneManager.LoadScene(_Scenes.sceneLobby);
     }
+
+    public void Battle()
+    {
+        CrossPlatformInputManager.SetButtonUp("Lobby");
+        SceneManager.LoadScene(_Scenes.sceneBattle);
+    }
+
 }

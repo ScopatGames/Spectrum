@@ -30,10 +30,11 @@ public class PlayerManager {
 
     }
 
-    public int GenerateRandomTerrainSeed()
+    //Generate Random Terrain Seed currently inside PlayerLobbyHook.cs
+    /*public int GenerateRandomTerrainSeed()
     {
         return (new System.Random()).Next(0, 1024);
-    }
+    }*/
 
     public void PlayerStateChange(_GameState gameState)
     {

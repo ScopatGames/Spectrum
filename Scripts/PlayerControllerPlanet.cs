@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityStandardAssets.CrossPlatformInput;
 
@@ -27,6 +28,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
     void Awake()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
+        StartCoroutine("CheckInterval");
     }
 
     void FixedUpdate()
@@ -103,7 +105,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
         childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
     }
 
-    void Update()
+    void RollCheck()
     {
         //Check to see if the player is flying upside-down
         if (rollIsAvailable && Vector3.Dot(childRollTransform.up, transform.position) < 0f)
@@ -119,11 +121,20 @@ public class PlayerControllerPlanet : NetworkBehaviour
             }
             rollCount++;
             rollIsAvailable = false;
-            Invoke("resetRollTimer", 1);
+            Invoke("ResetRollTimer", 1);
         }
     }
 
-    private void resetRollTimer()
+    IEnumerator CheckInterval()
+    {
+        while(true)
+        {
+            RollCheck();
+            yield return new WaitForSeconds(.2f);
+        }
+    }
+
+    private void ResetRollTimer()
     {
         rollIsAvailable = true;
     }
