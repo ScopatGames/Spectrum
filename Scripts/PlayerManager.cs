@@ -40,7 +40,8 @@ public class PlayerManager {
     {
         switch (gameState)
         {
-            case _GameState.Neutral:
+            case _GameState.SingleNeutral:
+            case _GameState.MultiNeutral:
                 playerSetup.EnableSpaceGraphics();
                 instance.transform.position = GameManager.instance.spaceSpawnPoints[playerSetup.playerNumber].position;
                 instance.transform.rotation = Quaternion.Euler(Vector3.zero);
@@ -48,7 +49,7 @@ public class PlayerManager {
                 playerCamera.EnableSpaceCamera();
                 break;
 
-            case _GameState.PlayerOnePlanet:
+            case _GameState.MultiPlayerOnePlanet:
                 if (playerNumber == 1)
                 {
                     playerSetup.EnablePlanetGraphics();
@@ -66,7 +67,7 @@ public class PlayerManager {
                 }
                 break;
 
-            case _GameState.PlayerTwoPlanet:
+            case _GameState.MultiPlayerTwoPlanet:
                 if (playerNumber == 0)
                 {
                     playerSetup.EnablePlanetGraphics();

@@ -28,7 +28,8 @@ public enum _GameState
     MultiPlayerOnePlanet,
     MultiPlayerTwoPlanet,
     SingleNeutral,
-    SinglePlanet
+    SinglePlanetAttack,
+    SinglePlanetDefend
 
 }
 

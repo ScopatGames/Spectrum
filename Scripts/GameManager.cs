@@ -110,9 +110,14 @@ public class GameManager :NetworkBehaviour {
         RpcGameStateSetup(_GameState.MultiNeutral);
     }
 
-    public void ChangeGameStateSinglePlanet()
+    public void ChangeGameStateSinglePlanetAttack()
     {
-        GameStateSetup(_GameState.SinglePlanet);
+        GameStateSetup(_GameState.SinglePlanetAttack);
+    }
+
+    public void ChangeGameStateSinglePlanetDefend()
+    {
+        GameStateSetup(_GameState.SinglePlanetDefend);
     }
 
     public void ChangeGameStateSingleNeutral()
@@ -221,7 +226,9 @@ public class GameManager :NetworkBehaviour {
 
     private void GameStateSingleNeutral() { }
 
-    private void GameStateSinglePlanet() { }
+    private void GameStateSinglePlanetAttack() { }
+
+    private void GameStateSinglePlanetDefend() { }
 
     private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
     {
@@ -463,8 +470,11 @@ public class GameManager :NetworkBehaviour {
             case _GameState.SingleNeutral:
                 GameStateSingleNeutral();
                 break;
-            case _GameState.SinglePlanet:
-                GameStateSinglePlanet();
+            case _GameState.SinglePlanetAttack:
+                GameStateSinglePlanetAttack();
+                break;
+            case _GameState.SinglePlanetDefend:
+                GameStateSinglePlanetDefend();
                 break;
         }
     }
