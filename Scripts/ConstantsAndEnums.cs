@@ -23,7 +23,8 @@ public enum _ColorType
 public enum _GameState
 {
     MainMenu,
-    Lobby,
+    SinglePlayerLobby,
+    MultiplayerLobby,
     MultiNeutral,
     MultiPlayerOnePlanet,
     MultiPlayerTwoPlanet,
@@ -37,11 +38,11 @@ public enum _GameState
 
 public class _Scenes
 {
-    public const string sceneBattle = "sceneBattle";
-    public const string sceneBattleSpace = "sceneBattleSpace";
-    public const string sceneBattlePlanet = "sceneBattlePlanet";
     public const string sceneMainMenu = "sceneMainMenu";
-    public const string sceneLobby = "sceneLobby";
+    public const string sceneSinglePlayerLobby = "sceneSinglePlayerLobby";
+    public const string sceneMultiplayerLobby = "sceneMultiplayerLobby";
+    public const string sceneSinglePlayer = "sceneSinglePlayer";
+    public const string sceneMultiplayer = "sceneMultiplayer";
 }
 
 public class _Tags

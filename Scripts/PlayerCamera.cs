@@ -62,10 +62,10 @@ public class PlayerCamera : NetworkBehaviour {
 
     private IEnumerator GetOtherPlayerTransform()
     {
-        while (GameManager.playerManagers.Count < 2)
+        while (GameData.playerManagers.Count < 2)
             yield return null;
 
-        foreach(PlayerManager pm in GameManager.playerManagers)
+        foreach(PlayerManager pm in GameData.playerManagers)
         {
             if (pm.playerCamera != this) {
                 otherPlayerTransform = pm.playerCamera.transform;

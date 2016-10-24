@@ -5,16 +5,16 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class SceneControllerMainMenu : MonoBehaviour {
     	
-    public void Lobby()
+    public void Multiplayer()
     {
-        CrossPlatformInputManager.SetButtonUp("Lobby");
-        SceneManager.LoadScene(_Scenes.sceneLobby);
+        CrossPlatformInputManager.SetButtonUp("Multiplayer");
+        SceneManager.LoadScene(_Scenes.sceneMultiplayerLobby);
     }
 
-    public void Battle()
+    public void SinglePlayer()
     {
-        CrossPlatformInputManager.SetButtonUp("Lobby");
-        SceneManager.LoadScene(_Scenes.sceneBattle);
+        CrossPlatformInputManager.SetButtonUp("SinglePlayer");
+        SceneManager.LoadScene(_Scenes.sceneSinglePlayerLobby);
     }
 
 }

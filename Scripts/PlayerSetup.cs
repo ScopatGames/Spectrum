@@ -41,7 +41,7 @@ public class PlayerSetup : NetworkBehaviour {
 
         if (!isServer)
         {
-            GameManager.AddPlayer(gameObject, playerNumber, colorIndex, playerName, randomTerrainSeed);
+            GameData.AddPlayer(gameObject, playerNumber, colorIndex, playerName, randomTerrainSeed);
         }
 
         //get player colors
