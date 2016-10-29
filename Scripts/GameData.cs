@@ -6,10 +6,6 @@ public class GameData : MonoBehaviour {
 
     static public GameData instance;
     static public List<PlayerManager> playerManagers = new List<PlayerManager>();
-    static public System.Random randomSeedGenerator = new System.Random();
-
-    [Header("Number of players:")]
-    public int numberOfPlayers;
 
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
@@ -26,7 +22,6 @@ public class GameData : MonoBehaviour {
 
     [Header("------ Player Data ------")]
     public TextAsset colorListTextAsset;
-    public bool randomColors = true;
 
     [HideInInspector]
     public Dictionary<string, Color>[] playerColorDictionaries = new Dictionary<string, Color>[2];
@@ -72,6 +67,18 @@ public class GameData : MonoBehaviour {
         playerManagers.Add(tempPlayer);
     }
 
+    static public void AddOpponent(GameObject opponent, int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
+    {
+        PlayerManager tempPlayer = new PlayerManager();
+        tempPlayer.instance = opponent;
+        tempPlayer.playerNumber = playerNum;
+        tempPlayer.playerColorIndex = playerColorIndex;
+        tempPlayer.playerName = name;
+        tempPlayer.randomTerrainSeed = randomTerrainSeed;
+
+        playerManagers.Add(tempPlayer);
+    }
+
 
     public void Setup()
     {
@@ -89,7 +96,7 @@ public class GameData : MonoBehaviour {
     private void AssignColorToTerrainTiles()
     {
         MeshRenderer mR;
-        for (int i = 0; i < numberOfPlayers; i++)
+        for (int i = 0; i < 2; i++)
         {
             mR = terrainTilePrefab[i].GetComponent<MeshRenderer>();
             mR.sharedMaterial.SetColor("_Color", playerColorDictionaries[i][_ColorType.BaseMain.ToString()]);
@@ -99,7 +106,7 @@ public class GameData : MonoBehaviour {
 
     private void AssignPlayerColors()
     {
-        //Assign color sub-dictionaries to each player. This is still applicable to single player, hence looping through 2
+        //Assign color sub-dictionaries to each player. 
         for (int i = 0; i < 2; i++)
         {
             playerColorDictionaries[i] = colorDictionary.GetColorDictionary(((_Colors)playerManagers[i].playerColorIndex).ToString());
@@ -261,7 +268,7 @@ public class GameData : MonoBehaviour {
 
         //scale and randomize vertex data
         float perlinNoiseFactor;
-        for (int i = 0; i < numberOfPlayers; i++)
+        for (int i = 0; i < 2; i++)
         {
             playerTerrainVertices[i] = new List<Vector3>();
             for (int j = 0; j < parsedTerrainVertices.Count; j++)
@@ -275,7 +282,7 @@ public class GameData : MonoBehaviour {
 
     private IEnumerator RegenerateTerrain()
     {
-        while (playerManagers.Count < numberOfPlayers)
+        while (playerManagers.Count < 2)
             yield return null;
 
         //This method (re)generates randomized terrain for both players
@@ -299,7 +306,7 @@ public class GameData : MonoBehaviour {
         playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
 
         //Generate player one and player two terrains
-        for (int i = 0; i < numberOfPlayers; i++)
+        for (int i = 0; i < 2; i++)
         {
             //Create the current player terrain tile container
             playerTerrains.Add(new GameObject());

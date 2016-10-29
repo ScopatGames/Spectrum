@@ -46,5 +46,10 @@ public class ColorDictionary {
         return colorDictionary[color];
     }
 
+    public int GetColorCount()
+    {
+        return colorDictionary.Count;
+    }
+
    
 }

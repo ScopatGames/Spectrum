@@ -7,10 +7,6 @@ public class GameManagerMultiplayer :NetworkBehaviour {
 
     private GameData gameData;
     
-    [Header("Number of players:")]
-    public int numberOfPlayers;
-
-    
     void Awake()
     {
         gameData = GetComponent<GameData>();
@@ -48,7 +44,7 @@ public class GameManagerMultiplayer :NetworkBehaviour {
     //--------------------------------------------------------------
     private IEnumerator GameLoop()
     {
-        while(GameData.playerManagers.Count < numberOfPlayers)
+        while(GameData.playerManagers.Count < 2)
             yield return null;
 
     }
@@ -108,7 +104,7 @@ public class GameManagerMultiplayer :NetworkBehaviour {
     
     private IEnumerator InitiateGameStateMultiNeutral()
     {
-        while (GameData.playerManagers.Count < numberOfPlayers)
+        while (GameData.playerManagers.Count < 2)
         {
             yield return null;
         }
