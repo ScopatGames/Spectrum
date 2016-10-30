@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityStandardAssets.CrossPlatformInput;
+
 
 public class SinglePlayerSetup : MonoBehaviour {
     public TextAsset colorListTextAsset;
@@ -32,6 +35,12 @@ public class SinglePlayerSetup : MonoBehaviour {
 
         GameData.AddPlayer(player, 0, playerColorIndex, "player", GenerateRandomTerrainSeed());
         GameData.AddOpponent(opponent, 1, opponentColorIndex, "opponent", GenerateRandomTerrainSeed());
+    }
+
+    public void StartGame()
+    {
+        CrossPlatformInputManager.SetButtonUp("StartGame");
+        SceneManager.LoadScene(_Scenes.sceneSinglePlayer);
     }
 
     private int GenerateRandomTerrainSeed()
