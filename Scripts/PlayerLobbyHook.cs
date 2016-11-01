@@ -11,7 +11,7 @@ public class PlayerLobbyHook : LobbyHook {
         LobbyPlayer lp = lobbyPlayer.GetComponent<LobbyPlayer>();
 
         if (lp != null)
-            GameData.AddPlayer(gamePlayer, lp.slot, lp.GetPlayerColorIndex(), lp.nameInput.text, GenerateRandomTerrainSeed());
+            GameData.AddMultiplayer(gamePlayer, lp.slot, lp.GetPlayerColorIndex(), lp.nameInput.text, GenerateRandomTerrainSeed());
     }
 
     private int GenerateRandomTerrainSeed()

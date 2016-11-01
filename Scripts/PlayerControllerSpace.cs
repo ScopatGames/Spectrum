@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerControllerSpace : NetworkBehaviour {
@@ -44,12 +43,9 @@ public class PlayerControllerSpace : NetworkBehaviour {
             Vector3 newPos;
             if (transform.position.sqrMagnitude > boundaryRadius * boundaryRadius)
             {
-                if (isLocalPlayer)
-                {
-                    newPos = transform.position.normalized * boundaryRadius;
-                    newPos.z = 0f;
-                    transform.position = newPos;
-                }
+                newPos = transform.position.normalized * boundaryRadius;
+                newPos.z = 0f;
+                transform.position = newPos;
             }
             ////////////END BOUNDARY CONTROL/////////////////
         }

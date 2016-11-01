@@ -12,8 +12,10 @@ public class PlayerManager {
     public int randomTerrainSeed;
 
     public PlayerSetup playerSetup;
+    public PlayerSetupSP playerSetupSP;
     public PlayerControl playerControl;
     public PlayerCamera playerCamera;
+    public PlayerCameraSP playerCameraSP;
 
     public void Setup()
     {
@@ -30,11 +32,35 @@ public class PlayerManager {
 
     }
 
+    public void SetupSP(GameObject playerGameObject)
+    {
+        instance = playerGameObject;
+
+        //Get references to the components
+        playerSetupSP = instance.GetComponent<PlayerSetupSP>();
+        playerControl = instance.GetComponent<PlayerControl>();
+        playerCameraSP = instance.GetComponent<PlayerCameraSP>();
+
+
+        playerSetupSP.colorIndex = playerColorIndex;
+        playerSetupSP.playerName = playerName;
+        playerSetupSP.playerNumber = playerNumber;
+        playerSetupSP.randomTerrainSeed = randomTerrainSeed;
+
+    }
+
     public void PlayerStateChange(_GameState gameState)
     {
         switch (gameState)
         {
             case _GameState.SingleNeutral:
+                playerSetupSP.EnableSpaceGraphics();
+                instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetupSP.playerNumber].position;
+                instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                playerControl.EnableSpaceControl();
+                playerCameraSP.EnableSpaceCamera();
+                break;
+
             case _GameState.MultiNeutral:
                 playerSetup.EnableSpaceGraphics();
                 instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetup.playerNumber].position;

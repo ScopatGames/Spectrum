@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerControl : NetworkBehaviour {
+public class PlayerControl : MonoBehaviour {
 
     public int spaceBoundaryRadius = 45;
     public int planetBoundaryRadius = 80;

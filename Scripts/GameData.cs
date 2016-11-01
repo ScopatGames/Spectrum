@@ -54,7 +54,7 @@ public class GameData : MonoBehaviour {
 
     //STATIC METHODS
     //------------------------------------------------
-    static public void AddPlayer(GameObject player, int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
+    static public void AddMultiplayer(GameObject player, int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
     {
         PlayerManager tempPlayer = new PlayerManager();
         tempPlayer.instance = player;
@@ -67,10 +67,9 @@ public class GameData : MonoBehaviour {
         playerManagers.Add(tempPlayer);
     }
 
-    static public void AddOpponent(GameObject opponent, int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
+    static public void AddSinglePlayer(int playerNum, int playerColorIndex, string name, int randomTerrainSeed)
     {
         PlayerManager tempPlayer = new PlayerManager();
-        tempPlayer.instance = opponent;
         tempPlayer.playerNumber = playerNum;
         tempPlayer.playerColorIndex = playerColorIndex;
         tempPlayer.playerName = name;

@@ -91,12 +91,9 @@ public class PlayerControllerPlanet : NetworkBehaviour
             Vector3 newPos;
             if (transform.position.sqrMagnitude > outerBoundaryRadius * outerBoundaryRadius)
             {
-                if (isLocalPlayer)
-                {
-                    newPos = transform.position.normalized * outerBoundaryRadius;
-                    newPos.z = 0f;
-                    transform.position = newPos;
-                }
+                newPos = transform.position.normalized * outerBoundaryRadius;
+                newPos.z = 0f;
+                transform.position = newPos;
             }
             ////////////END BOUNDARY CONTROL/////////////////
         }

@@ -4,7 +4,9 @@ using System.Collections;
 
 public class GameManagerSinglePlayer : MonoBehaviour {
 
+    public GameObject playerPrefab;
     private GameData gameData;
+    private GameObject player;
 
     void Awake()
     {
@@ -13,6 +15,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
 
     void Start()
     {
+        InstantiatePlayer();
         gameData.Setup();
         StartCoroutine("InitiateGameStateSingleNeutral");
         StartCoroutine("GameLoop");
@@ -44,6 +47,21 @@ public class GameManagerSinglePlayer : MonoBehaviour {
             yield return null;
         }
 
+    }
+
+    private void InstantiatePlayer()
+    {
+        System.Random rnd = new System.Random();
+        player = (GameObject)Instantiate(playerPrefab, gameData.spaceSpawnPoints[rnd.Next(0, gameData.spaceSpawnPoints.Count)]);
+        //associate this gameobject to the playermanager
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == 0)
+            {
+                pm.instance = player;
+                break;
+            }
+        }
     }
     /**** USE THESE AS REFERENCE TO BUILD SINGLE PLAYER STATE CHANGES
     private void GameStateMultiNeutral()

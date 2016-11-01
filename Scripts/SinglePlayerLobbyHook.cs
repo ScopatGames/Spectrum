@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
 
 
-public class SinglePlayerSetup : MonoBehaviour {
+public class SinglePlayerLobbyHook : MonoBehaviour {
     public TextAsset colorListTextAsset;
     public MeshRenderer avatarMesh;
     private ColorDictionary colorDictionary;

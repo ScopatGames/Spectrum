@@ -1,24 +1,13 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 
-public class PlayerSetup : NetworkBehaviour {
+public class PlayerSetupSP : MonoBehaviour {
 
-    [Header("Network")]
-    [Space]
-    [SyncVar]
     public int colorIndex;
-
-    [SyncVar]
     public string playerName;
-
-    [SyncVar]
     public int playerNumber;
-
-    [SyncVar]
     public bool isReady = false;
-
-    [SyncVar]
     public int randomTerrainSeed;
 
 
@@ -35,14 +24,9 @@ public class PlayerSetup : NetworkBehaviour {
     private CircleCollider2D spaceCollider;
     private BoxCollider2D planetCollider;
 
-    public override void OnStartClient()
+    void Start()
     {
-        base.OnStartClient();
-
-        if (!isServer)
-        {
-            GameData.AddMultiplayer(gameObject, playerNumber, colorIndex, playerName, randomTerrainSeed);
-        }
+        
 
         //get player colors
         playerColors = (new ColorDictionary(colorList)).GetColorDictionary(((_Colors)colorIndex).ToString());
@@ -95,5 +79,4 @@ public class PlayerSetup : NetworkBehaviour {
         planetCollider.enabled = false;
         spaceCollider.enabled = false;
     }
-
 }
