@@ -11,11 +11,11 @@ public class GameManagerSinglePlayer : MonoBehaviour {
     void Awake()
     {
         gameData = GetComponent<GameData>();
+        InstantiatePlayer();
     }
 
     void Start()
     {
-        InstantiatePlayer();
         gameData.Setup();
         StartCoroutine("InitiateGameStateSingleNeutral");
         StartCoroutine("GameLoop");
@@ -52,13 +52,14 @@ public class GameManagerSinglePlayer : MonoBehaviour {
     private void InstantiatePlayer()
     {
         System.Random rnd = new System.Random();
-        player = (GameObject)Instantiate(playerPrefab, gameData.spaceSpawnPoints[rnd.Next(0, gameData.spaceSpawnPoints.Count)]);
+        player = (GameObject)Instantiate(playerPrefab);
+        player.transform.parent = null;
         //associate this gameobject to the playermanager
         foreach (PlayerManager pm in GameData.playerManagers)
         {
             if (pm.playerNumber == 0)
             {
-                pm.instance = player;
+                pm.SetupSP(player);
                 break;
             }
         }
@@ -117,7 +118,25 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         }
     }
     */
-    private void GameStateSingleNeutral() { }
+    private void GameStateSingleNeutral() {
+        if (GameData.playerTerrains.Count == 2)
+        {
+            GameData.playerTerrains[0].SetActive(false);
+            GameData.playerTerrains[1].SetActive(false);
+        }
+        gameData.dynamicLight.intensity = gameData.spaceDynamicLightingIntensity;
+        gameData.dynamicLight.transform.rotation = Quaternion.Euler(gameData.spaceDynamicLightingRotation);
+        gameData.backgroundMeshRenderer.material = gameData.spaceBackgroundMaterial;
+        gameData.starsParticleSystem.Play();
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == 0)
+            {
+                pm.PlayerStateChange(_GameState.SingleNeutral);
+                break;
+            }
+        }
+    }
 
     private void GameStateSinglePlanetAttack() { }
 

@@ -18,7 +18,7 @@ public class PlayerCameraSP : MonoBehaviour {
         mainCamera.transform.parent = null;
         mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200f);
         mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
-        StartCoroutine("GetOtherPlayerTransform");
+        otherPlayerTransform = transform;
     }
 
     public void EnableSpaceCamera()
@@ -44,17 +44,5 @@ public class PlayerCameraSP : MonoBehaviour {
         smoothCameraPlanet.target = otherPlayerTransform;
     }
 
-    private IEnumerator GetOtherPlayerTransform()
-    {
-        while (GameData.playerManagers.Count < 2)
-            yield return null;
-
-        foreach (PlayerManager pm in GameData.playerManagers)
-        {
-            if (pm.playerCamera != this)
-            {
-                otherPlayerTransform = pm.playerCamera.transform;
-            }
-        }
-    }
+    
 }

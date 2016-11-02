@@ -14,6 +14,7 @@ public class PlayerManager {
     public PlayerSetup playerSetup;
     public PlayerSetupSP playerSetupSP;
     public PlayerControl playerControl;
+    public PlayerControlSP playerControlSP;
     public PlayerCamera playerCamera;
     public PlayerCameraSP playerCameraSP;
 
@@ -38,7 +39,7 @@ public class PlayerManager {
 
         //Get references to the components
         playerSetupSP = instance.GetComponent<PlayerSetupSP>();
-        playerControl = instance.GetComponent<PlayerControl>();
+        playerControlSP = instance.GetComponent<PlayerControlSP>();
         playerCameraSP = instance.GetComponent<PlayerCameraSP>();
 
 
@@ -57,7 +58,7 @@ public class PlayerManager {
                 playerSetupSP.EnableSpaceGraphics();
                 instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetupSP.playerNumber].position;
                 instance.transform.rotation = Quaternion.Euler(Vector3.zero);
-                playerControl.EnableSpaceControl();
+                playerControlSP.EnableSpaceControl();
                 playerCameraSP.EnableSpaceCamera();
                 break;
 
