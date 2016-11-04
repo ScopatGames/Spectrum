@@ -51,8 +51,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
 
     private void InstantiatePlayer()
     {
-        System.Random rnd = new System.Random();
-        player = (GameObject)Instantiate(playerPrefab);
+        player = (GameObject)Instantiate(playerPrefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
         player.transform.parent = null;
         //associate this gameobject to the playermanager
         foreach (PlayerManager pm in GameData.playerManagers)

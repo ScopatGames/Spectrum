@@ -17,7 +17,6 @@ public class CubePickup : MonoBehaviour {
 
     void DestroyCube()
     {
-        Destroy(gameObject);
-        GetComponentInParent<PickupCounter>().incrementCounter();
+        Destroy(gameObject); //TODO: Edit this to change state of opponent
     }
 }
