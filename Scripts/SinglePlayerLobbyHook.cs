@@ -12,6 +12,7 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
     private Dictionary<string, Color> playerColors;
     private int playerColorIndex;
     private int opponentColorIndex;
+    private int prevRando = -1;
 
     void Awake () {
         colorDictionary = new ColorDictionary(colorListTextAsset);
@@ -58,6 +59,11 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
 
     private int GenerateRandomTerrainSeed()
     {
-        return (new System.Random()).Next(0, 1024);
+
+        int rando = prevRando;
+        while (rando == prevRando) {
+            rando = (new System.Random()).Next(0, 1024);
+        }
+        return rando;
     }
 }

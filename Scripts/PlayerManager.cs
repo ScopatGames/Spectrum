@@ -62,6 +62,20 @@ public class PlayerManager {
                 playerCameraSP.EnableSpaceCamera();
                 break;
 
+            case _GameState.SinglePlanetAttack:
+                playerSetupSP.EnablePlanetGraphics();
+                instance.transform.position = GameData.instance.planetSpawnPoints[playerSetupSP.playerNumber].position;
+                instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                playerControlSP.EnablePlanetControl();
+                playerCameraSP.EnablePlanetCameraAttacker();
+                break;
+
+            case _GameState.SinglePlanetDefend:
+                playerSetupSP.DisableAllGraphics();
+                playerControlSP.DisableAllControl();
+                playerCameraSP.EnablePlanetCameraDefender();
+                break;
+
             case _GameState.MultiNeutral:
                 playerSetup.EnableSpaceGraphics();
                 instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetup.playerNumber].position;

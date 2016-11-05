@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class GameManagerSinglePlayer : MonoBehaviour {
 
@@ -38,6 +40,12 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         GameStateSetup(_GameState.SingleNeutral);
     }
 
+    public void ReturnToSinglePlayerLobby()
+    {
+        CrossPlatformInputManager.SetButtonUp("Lobby");
+        SceneManager.LoadScene(_Scenes.sceneSinglePlayerLobby);
+    }
+
     //PRIVATE METHODS
     //--------------------------------------------------------------
     private IEnumerator GameLoop()
@@ -63,60 +71,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
             }
         }
     }
-    /**** USE THESE AS REFERENCE TO BUILD SINGLE PLAYER STATE CHANGES
-    private void GameStateMultiNeutral()
-    {
-        if (playerTerrains.Count == 2)
-        {
-            playerTerrains[0].SetActive(false);
-            playerTerrains[1].SetActive(false);
-        }
-        dynamicLight.intensity = spaceDynamicLightingIntensity;
-        dynamicLight.transform.rotation = Quaternion.Euler(spaceDynamicLightingRotation);
-        backgroundMeshRenderer.material = spaceBackgroundMaterial;
-        starsParticleSystem.Play();
-        foreach (PlayerManager pm in playerManagers)
-        {
-            pm.PlayerStateChange(_GameState.MultiNeutral);
-        }
-    }
-
-    private void GameStateMultiPlayerOnePlanet()
-    {
-        if (playerTerrains.Count == 2)
-        {
-            playerTerrains[0].SetActive(true);
-            playerTerrains[1].SetActive(false);
-        }
-        dynamicLight.intensity = planetDynamicLightingIntensity;
-        dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
-        backgroundMeshRenderer.material = planetBackgroundMaterial;
-        starsParticleSystem.Stop();
-        starsParticleSystem.Clear();
-        foreach (PlayerManager pm in playerManagers)
-        {
-            pm.PlayerStateChange(_GameState.MultiPlayerOnePlanet);
-        }
-    }
-
-    private void GameStateMultiPlayerTwoPlanet()
-    {
-        if (playerTerrains.Count == 2)
-        {
-            playerTerrains[0].SetActive(false);
-            playerTerrains[1].SetActive(true);
-        }
-        dynamicLight.intensity = planetDynamicLightingIntensity;
-        dynamicLight.transform.rotation = Quaternion.Euler(planetDynamicLightingRotation);
-        backgroundMeshRenderer.material = planetBackgroundMaterial;
-        starsParticleSystem.Stop();
-        starsParticleSystem.Clear();
-        foreach (PlayerManager pm in playerManagers)
-        {
-            pm.PlayerStateChange(_GameState.MultiPlayerTwoPlanet);
-        }
-    }
-    */
+    
     private void GameStateSingleNeutral() {
         if (GameData.playerTerrains.Count == 2)
         {
@@ -137,9 +92,47 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         }
     }
 
-    private void GameStateSinglePlanetAttack() { }
+    private void GameStateSinglePlanetAttack() {
+        if (GameData.playerTerrains.Count == 2)
+        {
+            GameData.playerTerrains[0].SetActive(false);
+            GameData.playerTerrains[1].SetActive(true);
+        }
+        gameData.dynamicLight.intensity = gameData.planetDynamicLightingIntensity;
+        gameData.dynamicLight.transform.rotation = Quaternion.Euler(gameData.planetDynamicLightingRotation);
+        gameData.backgroundMeshRenderer.material = gameData.planetBackgroundMaterial;
+        gameData.starsParticleSystem.Stop();
+        gameData.starsParticleSystem.Clear();
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == 0)
+            {
+                pm.PlayerStateChange(_GameState.SinglePlanetAttack);
+                break;
+            }
+        }
+    }
 
-    private void GameStateSinglePlanetDefend() { }
+    private void GameStateSinglePlanetDefend() {
+        if (GameData.playerTerrains.Count == 2)
+        {
+            GameData.playerTerrains[0].SetActive(true);
+            GameData.playerTerrains[1].SetActive(false);
+        }
+        gameData.dynamicLight.intensity = gameData.planetDynamicLightingIntensity;
+        gameData.dynamicLight.transform.rotation = Quaternion.Euler(gameData.planetDynamicLightingRotation);
+        gameData.backgroundMeshRenderer.material = gameData.planetBackgroundMaterial;
+        gameData.starsParticleSystem.Stop();
+        gameData.starsParticleSystem.Clear();
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if(pm.playerNumber == 0)
+            {
+                pm.PlayerStateChange(_GameState.SinglePlanetDefend);
+                break;
+            }
+        }
+    }
 
     private void GameStateSetup(_GameState gameState)
     {
