@@ -16,7 +16,7 @@ public class PlayerLobbyHook : LobbyHook {
 
     private int GenerateRandomTerrainSeed()
     {
-        return (new System.Random()).Next(0, 1024);
+        return Random.Range(0, 1024);
     }
 
 }

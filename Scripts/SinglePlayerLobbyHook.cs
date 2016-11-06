@@ -12,7 +12,6 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
     private Dictionary<string, Color> playerColors;
     private int playerColorIndex;
     private int opponentColorIndex;
-    private int prevRando = -1;
 
     void Awake () {
         colorDictionary = new ColorDictionary(colorListTextAsset);
@@ -30,10 +29,7 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
 
     public void StartGame()
     {
-        if(GameData.playerManagers.Count > 0)
-        {
-            GameData.playerManagers.Clear();
-        }
+        GameData.playerManagers.Clear();
         AddPlayer();
         AddOpponent();
         CrossPlatformInputManager.SetButtonUp("StartGame");
@@ -43,27 +39,16 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
     //PRIVATE METHODS
     private void AddPlayer()
     {
-        GameData.AddSinglePlayer(0, playerColorIndex, "player", GenerateRandomTerrainSeed());
+        GameData.AddSinglePlayer(0, playerColorIndex, "player", Random.Range(0, 1024));
     }
 
     private void AddOpponent()
     {
-        System.Random randGen = new System.Random();
         opponentColorIndex = playerColorIndex;
         while(opponentColorIndex == playerColorIndex)
         {
-            opponentColorIndex = randGen.Next(0, colorDictionary.GetColorCount());
+            opponentColorIndex = Random.Range(0, colorDictionary.GetColorCount());
         }
-        GameData.AddSinglePlayer(1, opponentColorIndex, "opponent", GenerateRandomTerrainSeed());
-    }
-
-    private int GenerateRandomTerrainSeed()
-    {
-
-        int rando = prevRando;
-        while (rando == prevRando) {
-            rando = (new System.Random()).Next(0, 1024);
-        }
-        return rando;
+        GameData.AddSinglePlayer(1, opponentColorIndex, "opponent",Random.Range(0, 1024));
     }
 }

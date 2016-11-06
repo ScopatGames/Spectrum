@@ -37,16 +37,19 @@ public class PlayerManager {
     {
         instance = playerGameObject;
 
-        //Get references to the components
-        playerSetupSP = instance.GetComponent<PlayerSetupSP>();
-        playerControlSP = instance.GetComponent<PlayerControlSP>();
-        playerCameraSP = instance.GetComponent<PlayerCameraSP>();
+        //Get references to the components for player
+        if (playerNumber == 0)
+        { //if player and not computer opponent
+            playerSetupSP = instance.GetComponent<PlayerSetupSP>();
+            playerControlSP = instance.GetComponent<PlayerControlSP>();
+            playerCameraSP = instance.GetComponent<PlayerCameraSP>();
 
 
-        playerSetupSP.colorIndex = playerColorIndex;
-        playerSetupSP.playerName = playerName;
-        playerSetupSP.playerNumber = playerNumber;
-        playerSetupSP.randomTerrainSeed = randomTerrainSeed;
+            playerSetupSP.colorIndex = playerColorIndex;
+            playerSetupSP.playerName = playerName;
+            playerSetupSP.playerNumber = playerNumber;
+            playerSetupSP.randomTerrainSeed = randomTerrainSeed;
+        }
 
     }
 
@@ -55,25 +58,48 @@ public class PlayerManager {
         switch (gameState)
         {
             case _GameState.SingleNeutral:
-                playerSetupSP.EnableSpaceGraphics();
-                instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetupSP.playerNumber].position;
-                instance.transform.rotation = Quaternion.Euler(Vector3.zero);
-                playerControlSP.EnableSpaceControl();
-                playerCameraSP.EnableSpaceCamera();
+                switch (playerNumber)
+                {
+                    case 0: //player
+                        playerSetupSP.EnableSpaceGraphics();
+                        instance.transform.position = GameData.instance.spaceSpawnPoints[playerSetupSP.playerNumber].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                        playerControlSP.EnableSpaceControl();
+                        playerCameraSP.EnableSpaceCamera();
+                        break;
+                    case 1: //computer opponent
+                        break;
+                }
                 break;
 
             case _GameState.SinglePlanetAttack:
-                playerSetupSP.EnablePlanetGraphics();
-                instance.transform.position = GameData.instance.planetSpawnPoints[playerSetupSP.playerNumber].position;
-                instance.transform.rotation = Quaternion.Euler(Vector3.zero);
-                playerControlSP.EnablePlanetControl();
-                playerCameraSP.EnablePlanetCameraAttacker();
+                switch (playerNumber)
+                {
+                    case 0: //player
+                        playerSetupSP.EnablePlanetGraphics();
+                        instance.transform.position = GameData.instance.planetSpawnPoints[playerSetupSP.playerNumber].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                        playerControlSP.EnablePlanetControl();
+                        playerCameraSP.EnablePlanetCameraAttacker();
+                        break;
+                    case 1: //computer opponent
+                        break;
+                }
+                
                 break;
 
             case _GameState.SinglePlanetDefend:
-                playerSetupSP.DisableAllGraphics();
-                playerControlSP.DisableAllControl();
-                playerCameraSP.EnablePlanetCameraDefender();
+                switch (playerNumber)
+                {
+                    case 0: //player
+                        playerSetupSP.DisableAllGraphics();
+                        playerControlSP.DisableAllControl();
+                        playerCameraSP.EnablePlanetCameraDefender();
+                        break;
+                    case 1: //computer opponent
+                        break;
+                }
+                
                 break;
 
             case _GameState.MultiNeutral:
@@ -85,37 +111,38 @@ public class PlayerManager {
                 break;
 
             case _GameState.MultiPlayerOnePlanet:
-                if (playerNumber == 1)
+                switch (playerNumber)
                 {
-                    playerSetup.EnablePlanetGraphics();
-                    instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
-                    instance.transform.rotation = Quaternion.Euler(Vector3.zero);
-                    playerControl.EnablePlanetControl();
-                    playerCamera.EnablePlanetCameraAttacker();
-                }
-                else
-                {
-                    playerSetup.DisableAllGraphics();
-                    playerControl.DisableAllControl(); 
-                    playerCamera.EnablePlanetCameraDefender();
-                    
+                    case 0:
+                        playerSetup.DisableAllGraphics();
+                        playerControl.DisableAllControl();
+                        playerCamera.EnablePlanetCameraDefender();
+                        break;
+                    case 1:
+                        playerSetup.EnablePlanetGraphics();
+                        instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                        playerControl.EnablePlanetControl();
+                        playerCamera.EnablePlanetCameraAttacker();
+                        break;
                 }
                 break;
 
             case _GameState.MultiPlayerTwoPlanet:
-                if (playerNumber == 0)
+                switch (playerNumber)
                 {
-                    playerSetup.EnablePlanetGraphics();
-                    instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
-                    instance.transform.rotation = Quaternion.Euler(Vector3.zero);
-                    playerControl.EnablePlanetControl();
-                    playerCamera.EnablePlanetCameraAttacker();
-                }
-                else
-                {
-                    playerSetup.DisableAllGraphics();
-                    playerControl.DisableAllControl(); 
-                    playerCamera.EnablePlanetCameraDefender();
+                    case 0:
+                        playerSetup.EnablePlanetGraphics();
+                        instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
+                        playerControl.EnablePlanetControl();
+                        playerCamera.EnablePlanetCameraAttacker();
+                        break;
+                    case 1:
+                        playerSetup.DisableAllGraphics();
+                        playerControl.DisableAllControl();
+                        playerCamera.EnablePlanetCameraDefender();
+                        break;
                 }
                 break;
         }

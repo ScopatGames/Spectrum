@@ -7,13 +7,17 @@ using UnityStandardAssets.CrossPlatformInput;
 public class GameManagerSinglePlayer : MonoBehaviour {
 
     public GameObject playerPrefab;
+    public GameObject opponentPrefab;
+
     private GameData gameData;
+    private GameObject opponent;
     private GameObject player;
 
     void Awake()
     {
         gameData = GetComponent<GameData>();
         InstantiatePlayer();
+        InstantiateOpponent();
     }
 
     void Start()
@@ -57,22 +61,8 @@ public class GameManagerSinglePlayer : MonoBehaviour {
 
     }
 
-    private void InstantiatePlayer()
+    private void GameStateSingleNeutral()
     {
-        player = (GameObject)Instantiate(playerPrefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
-        player.transform.parent = null;
-        //associate this gameobject to the playermanager
-        foreach (PlayerManager pm in GameData.playerManagers)
-        {
-            if (pm.playerNumber == 0)
-            {
-                pm.SetupSP(player);
-                break;
-            }
-        }
-    }
-    
-    private void GameStateSingleNeutral() {
         if (GameData.playerTerrains.Count == 2)
         {
             GameData.playerTerrains[0].SetActive(false);
@@ -84,15 +74,12 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         gameData.starsParticleSystem.Play();
         foreach (PlayerManager pm in GameData.playerManagers)
         {
-            if (pm.playerNumber == 0)
-            {
-                pm.PlayerStateChange(_GameState.SingleNeutral);
-                break;
-            }
+            pm.PlayerStateChange(_GameState.SingleNeutral);
         }
     }
 
-    private void GameStateSinglePlanetAttack() {
+    private void GameStateSinglePlanetAttack()
+    {
         if (GameData.playerTerrains.Count == 2)
         {
             GameData.playerTerrains[0].SetActive(false);
@@ -105,15 +92,12 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         gameData.starsParticleSystem.Clear();
         foreach (PlayerManager pm in GameData.playerManagers)
         {
-            if (pm.playerNumber == 0)
-            {
-                pm.PlayerStateChange(_GameState.SinglePlanetAttack);
-                break;
-            }
+            pm.PlayerStateChange(_GameState.SinglePlanetAttack);
         }
     }
 
-    private void GameStateSinglePlanetDefend() {
+    private void GameStateSinglePlanetDefend()
+    {
         if (GameData.playerTerrains.Count == 2)
         {
             GameData.playerTerrains[0].SetActive(true);
@@ -126,11 +110,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         gameData.starsParticleSystem.Clear();
         foreach (PlayerManager pm in GameData.playerManagers)
         {
-            if(pm.playerNumber == 0)
-            {
-                pm.PlayerStateChange(_GameState.SinglePlanetDefend);
-                break;
-            }
+            pm.PlayerStateChange(_GameState.SinglePlanetDefend);
         }
     }
 
@@ -162,6 +142,38 @@ public class GameManagerSinglePlayer : MonoBehaviour {
 
         GameStateSingleNeutral();
     }
+
+    private void InstantiateOpponent()
+    {
+        opponent = (GameObject)Instantiate(opponentPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+        opponent.transform.parent = null;
+        //associate this gameobject to the opponent playermanager
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == 1)
+            {
+                pm.SetupSP(opponent);
+                break;
+            }
+        }
+    }
+
+    private void InstantiatePlayer()
+    {
+        player = (GameObject)Instantiate(playerPrefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
+        player.transform.parent = null;
+        //associate this gameobject to the playermanager
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == 0)
+            {
+                pm.SetupSP(player);
+                break;
+            }
+        }
+    }
+    
+    
 
     
 }
