@@ -12,7 +12,7 @@ public class LineSegmentRing : MonoBehaviour {
     private float segmentStartWidth;
     private float segmentEndWidth;
     private float expansionRate;
-    private float maxLocalScale = 10f;
+    private float maxLocalScale = 40f;
 
     public Pool lineSegmentPool;
 
@@ -26,29 +26,29 @@ public class LineSegmentRing : MonoBehaviour {
     private Vector3 tempPos3 = Vector3.zero;
     private float segmentRadians;
 
-    private bool isExpanding = false;
-    
     void Start()
     {
         ringController = GetComponentInParent<RingController>();
         lineSegmentPool = ringController.lineSegmentPool;
     }
 
-    void Update()
+    public void ExpandRing()
     {
-        if (isExpanding)
-        {
-            transform.localScale += new Vector3(expansionRate, expansionRate, 0f);
-            if(transform.localScale.x > maxLocalScale)
-            {
-                isExpanding = false;
-                transform.localScale = new Vector3(1f, 1f, 1f);
-                DismantleRing();
-                ringController.ReleaseRing(gameObject);
-            }
-        }
+        StartCoroutine("Expand");
     }
 
+    private IEnumerator Expand()
+    {
+        GetComponent<Spin>().speed = 0;
+        while(transform.localScale.x < maxLocalScale)
+        {
+            transform.localScale += new Vector3(expansionRate, expansionRate, 0f);
+            yield return null;
+        }
+        transform.localScale = new Vector3(1f, 1f, 1f);
+        DismantleRing();
+        ringController.ReleaseRing(gameObject);
+    }
 
     public void Setup(int segments_i, Color segmentStartColor_i, Color segmentEndColor_i, float segmentStartWidth_i, float segmentEndWidth_i, float expansionRate_i, float spin_i, Pool pool)
     {
@@ -60,48 +60,56 @@ public class LineSegmentRing : MonoBehaviour {
         GetComponent<Spin>().speed = spin_i;
         transform.localScale = new Vector3(1f, 1f, 1f);
         expansionRate = expansionRate_i;
-        isExpanding = true;
 
         BuildRing(pool);
     }
 
     private bool BuildRing(Pool segmentPool)
     {
-        if(segments <= segmentPool.CheckInventory())
+        if (segments <= segmentPool.CheckInventory())
         {
             segmentRadians = 2 * Mathf.PI / segments;
+            bool lastSegmentSkipped = true;
 
-            for(int i = 0; i < (segments-1); i++)
+            for (int i = 0; i < (segments - 1); i++)
             {
-                tempLineSegment = segmentPool.CheckOut();
-                tempLineSegment.transform.parent = transform;
-                tempLineSegment.transform.position = transform.position;
-                tempLineSegment.transform.rotation = Quaternion.identity;
-                tempLSC = tempLineSegment.GetComponent<LineSegmentController>();
-
-                //calculate tempPos1
-                if (i == 0)
+                if (Random.Range(0, 10) < 2 || i == 0)
                 {
-                    tempPos1.x = radius * Mathf.Cos(i * segmentRadians);
-                    tempPos1.y = radius * Mathf.Sin(i * segmentRadians);
+                    tempLineSegment = segmentPool.CheckOut();
+                    tempLineSegment.transform.parent = transform;
+                    tempLineSegment.transform.position = transform.position;
+                    tempLineSegment.transform.rotation = Quaternion.identity;
+                    tempLSC = tempLineSegment.GetComponent<LineSegmentController>();
+
+                    //calculate tempPos1
+                    if (lastSegmentSkipped)
+                    {
+                        tempPos1.x = radius * Mathf.Cos(i * segmentRadians);
+                        tempPos1.y = radius * Mathf.Sin(i * segmentRadians);
+                    }
+                    else
+                    {
+                        tempPos1.x = tempPos3.x;
+                        tempPos1.y = tempPos3.y;
+                    }
+                    //calculate tempPos3
+                    tempPos3.x = radius * Mathf.Cos((i + 1) * segmentRadians);
+                    tempPos3.y = radius * Mathf.Sin((i + 1) * segmentRadians);
+                    //calculate tempPos2
+                    tempPos2.x = (tempPos1.x + tempPos3.x) / 2;
+                    tempPos2.y = (tempPos1.y + tempPos3.y) / 2;
+
+                    tempLSC.SetPositions(tempPos1, tempPos2, tempPos3);
+                    tempLSC.SetColors(segmentStartColor, segmentEndColor);
+                    tempLSC.SetWidths(segmentStartWidth, segmentEndWidth);
+
+                    lineSegments.Add(tempLineSegment);
+                    lastSegmentSkipped = false;
                 }
                 else
                 {
-                    tempPos1.x = tempPos3.x;
-                    tempPos1.y = tempPos3.y;
+                    lastSegmentSkipped = true;
                 }
-                //calculate tempPos3
-                tempPos3.x = radius * Mathf.Cos((i + 1) * segmentRadians);
-                tempPos3.y = radius * Mathf.Sin((i + 1) * segmentRadians);
-                //calculate tempPos2
-                tempPos2.x = (tempPos1.x + tempPos3.x) / 2;
-                tempPos2.y = (tempPos1.y + tempPos3.y) / 2;
-
-                tempLSC.SetPositions(tempPos1, tempPos2, tempPos3);
-                tempLSC.SetColors(segmentStartColor, segmentEndColor);
-                tempLSC.SetWidths(segmentStartWidth, segmentEndWidth);
-
-                lineSegments.Add(tempLineSegment);
             }
             return true;
         }

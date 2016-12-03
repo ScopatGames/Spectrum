@@ -17,6 +17,7 @@ public class RingController : MonoBehaviour {
     public float maxSegmentEndWidth;
     public float minSpin;
     public float maxSpin;
+    public float deployRate;
     public float expansionRate;
 
     public Pool ringPool;
@@ -37,8 +38,43 @@ public class RingController : MonoBehaviour {
 
     void Awake()
     {
+        StartRound();
+    }
+
+    public void StartRound()
+    {
         InitializePools(numberOfRings, maxSegments);
-        RetrieveRing(ringPool);
+        RetrieveRings();
+        GetComponent<CircleCollider2D>().enabled = true;
+    }
+
+    void OnTriggerEnter2D(Collider2D other) 
+    {
+        if(other.tag == _Tags.player)
+        {
+            StartCoroutine("DeployRings");
+            GetComponent<CircleCollider2D>().enabled = false;
+        }
+    }
+
+    private IEnumerator DeployRings()
+    {
+        float timer = 0;
+
+        while(activeRings.Count > 0)
+        {
+                if (timer > deployRate)
+                {
+                    activeRings[0].GetComponent<LineSegmentRing>().ExpandRing();
+                    activeRings.RemoveAt(0);
+                    timer = 0;
+                }
+                else
+                {
+                    timer += Time.deltaTime;
+                    yield return null;
+                }
+        }
     }
 
     private void InitializePools(int numRings, int maxSegs)
@@ -53,7 +89,15 @@ public class RingController : MonoBehaviour {
         int segmentsInPool = lineSegmentPool.CheckInventory();
         if (segmentsInPool < (numRings * maxSegs))
         {
-            lineSegmentPool.InstantiatePoolObjects(numRings * maxSegs - segmentsInPool);
+            lineSegmentPool.InstantiatePoolObjects(numRings * maxSegs/2 - segmentsInPool);
+        }
+    }
+
+    private void RetrieveRings()
+    {
+        for (int i = 0; i < numberOfRings; i++)
+        {
+            RetrieveRing();
         }
     }
 
@@ -77,12 +121,10 @@ public class RingController : MonoBehaviour {
 
     public void ReleaseRing(GameObject ring)
     {
-        activeRings.Remove(ring);
         ringPool.CheckIn(ring);
-        RetrieveRing(ringPool);
     }
 
-    public void RetrieveRing(Pool ringPool)
+    public void RetrieveRing()
     {
         if (ringPool.CheckInventory() > 0)
         {
