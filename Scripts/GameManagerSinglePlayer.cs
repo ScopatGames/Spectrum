@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.CrossPlatformInput;
@@ -172,8 +171,5 @@ public class GameManagerSinglePlayer : MonoBehaviour {
             }
         }
     }
-    
-    
-
     
 }
