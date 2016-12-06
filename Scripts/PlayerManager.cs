@@ -18,6 +18,8 @@ public class PlayerManager {
     public PlayerCamera playerCamera;
     public PlayerCameraSP playerCameraSP;
 
+    public OpponentController opponentController;
+
     public void Setup()
     {
         //Get references to the components
@@ -38,19 +40,23 @@ public class PlayerManager {
         instance = playerGameObject;
 
         //Get references to the components for player
-        if (playerNumber == 0)
-        { //if player and not computer opponent
-            playerSetupSP = instance.GetComponent<PlayerSetupSP>();
-            playerControlSP = instance.GetComponent<PlayerControlSP>();
-            playerCameraSP = instance.GetComponent<PlayerCameraSP>();
+        switch(playerNumber)
+        {
+            case 0: //player
+                playerSetupSP = instance.GetComponent<PlayerSetupSP>();
+                playerControlSP = instance.GetComponent<PlayerControlSP>();
+                playerCameraSP = instance.GetComponent<PlayerCameraSP>();
 
 
-            playerSetupSP.colorIndex = playerColorIndex;
-            playerSetupSP.playerName = playerName;
-            playerSetupSP.playerNumber = playerNumber;
-            playerSetupSP.randomTerrainSeed = randomTerrainSeed;
+                playerSetupSP.colorIndex = playerColorIndex;
+                playerSetupSP.playerName = playerName;
+                playerSetupSP.playerNumber = playerNumber;
+                playerSetupSP.randomTerrainSeed = randomTerrainSeed;
+                break;
+            case 1: //computer opponent
+                opponentController = instance.GetComponent<OpponentController>();
+                break;
         }
-
     }
 
     public void PlayerStateChange(_GameState gameState)
@@ -68,6 +74,7 @@ public class PlayerManager {
                         playerCameraSP.EnableSpaceCamera();
                         break;
                     case 1: //computer opponent
+                        opponentController.EnableSpaceContainer();
                         break;
                 }
                 break;
@@ -83,6 +90,7 @@ public class PlayerManager {
                         playerCameraSP.EnablePlanetCameraAttacker();
                         break;
                     case 1: //computer opponent
+                        opponentController.EnableDefensiveContainer();
                         break;
                 }
                 
@@ -97,6 +105,7 @@ public class PlayerManager {
                         playerCameraSP.EnablePlanetCameraDefender();
                         break;
                     case 1: //computer opponent
+                        opponentController.EnableOffensiveContainer();
                         break;
                 }
                 

@@ -53,6 +53,7 @@ public class _Tags
     public const string player = "Player";
     public const string playerTwo = "PlayerTwo";
     public const string lobbyManager = "LobbyManager";
+    public const string environment = "Environment";
 }
 
 
