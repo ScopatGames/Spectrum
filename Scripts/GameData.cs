@@ -10,10 +10,10 @@ public class GameData : MonoBehaviour {
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
     public TextAsset textInputFaces;
-    public float terrainScale = 10.0f;
+    public float terrainScale = 12.0f;
     public int hexTerrainOrder = 30;
     public float hexRadius = 1f;
-    public _TerrainType terrainType;
+    static public _TerrainType terrainType = _TerrainType.QuadsTris;
     public List<GameObject> quadsTrisPrefab = new List<GameObject>();
     public List<GameObject> hexTilePrefab = new List<GameObject>();
 

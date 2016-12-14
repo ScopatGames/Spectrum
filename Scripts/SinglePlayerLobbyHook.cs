@@ -36,6 +36,11 @@ public class SinglePlayerLobbyHook : MonoBehaviour {
         SceneManager.LoadScene(_Scenes.sceneSinglePlayer);
     }
 
+    public void HexTerrain(bool hexTerrain)
+    {
+        GameData.terrainType = (hexTerrain) ? _TerrainType.Hexagonal : _TerrainType.QuadsTris;
+    }
+
     //PRIVATE METHODS
     private void AddPlayer()
     {
