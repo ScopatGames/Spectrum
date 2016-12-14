@@ -31,7 +31,12 @@ public enum _GameState
     SingleNeutral,
     SinglePlanetAttack,
     SinglePlanetDefend
+}
 
+public enum _TerrainType
+{
+    Hexagonal,
+    QuadsTris
 }
 
 //Constants

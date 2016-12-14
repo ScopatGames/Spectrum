@@ -10,8 +10,15 @@ public class GameData : MonoBehaviour {
     [Header("------ Terrain Generation Data ------")]
     public TextAsset textInputVertices;
     public TextAsset textInputFaces;
-    public float terrainScale = 40.0f;
-    public List<GameObject> terrainTilePrefab = new List<GameObject>();
+    public float terrainScale = 10.0f;
+    public int hexTerrainOrder = 30;
+    public float hexRadius = 1f;
+    public _TerrainType terrainType;
+    public List<GameObject> quadsTrisPrefab = new List<GameObject>();
+    public List<GameObject> hexTilePrefab = new List<GameObject>();
+
+    private List<GameObject> terrainTilePrefab = new List<GameObject>();
+
 
     [HideInInspector]
     static public List<GameObject> playerTerrains = new List<GameObject>();
@@ -50,6 +57,17 @@ public class GameData : MonoBehaviour {
     {
         //Singleton
         instance = this;
+
+        switch (terrainType)
+        {
+            case _TerrainType.Hexagonal:
+                terrainTilePrefab = hexTilePrefab;
+                break;
+            case _TerrainType.QuadsTris:
+                terrainTilePrefab = quadsTrisPrefab;
+                break;
+        }
+
     }
 
     //STATIC METHODS
@@ -87,7 +105,7 @@ public class GameData : MonoBehaviour {
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
-        StartCoroutine("RegenerateTerrain");
+        StartCoroutine("RegenerateTerrain", terrainType);
     }
 
     //PRIVATE METHODS
@@ -124,7 +142,62 @@ public class GameData : MonoBehaviour {
 
         return centroid;
     }
-    private void GenerateTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
+
+    private void GenerateHexagonalTerrain(GameObject playerTerrain, int order, int terrainIndex)
+    {
+        Vector3 tilePosition = Vector3.zero;
+        Vector3 hexScaleVector = Vector3.one;
+        hexScaleVector.x = hexRadius;
+        hexScaleVector.y = hexRadius;
+
+        //Gridding variables
+        float tempCos = Mathf.Cos(Mathf.PI / 6f);
+        float x = 2f * hexRadius * Mathf.Pow(tempCos, 2f);
+        float y = hexRadius * tempCos;
+
+        //Containers for sections
+        List<GameObject> sections = new List<GameObject>();
+        
+        //Generate Hub 
+        GameObject newTile = (GameObject)Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity);
+        hexScaleVector.z = Random.Range(0.5f, 1f) * hexRadius;
+        newTile.transform.localScale = hexScaleVector;
+        newTile.transform.parent = playerTerrain.transform;
+
+        //Generate Container GameObject for each section
+        for(int i = 0; i < 6; i++)
+        {
+            GameObject newSection = new GameObject();
+            newSection.transform.parent = playerTerrain.transform;
+            newSection.name = "Section " + i;
+            sections.Add(newSection);
+        }
+
+        //Generate Tiles for each Section
+        for (int col = 0; col < order; col++)
+        {
+            tilePosition.x = col * -x;
+            for(int row = 0; row < (order - col); row++)
+            {
+                tilePosition.y = y * (2f + 2f * row + col);
+                for(int i = 0; i < 6; i++)
+                {
+                    GameObject newHex = (GameObject)Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity);
+                    hexScaleVector.z = Random.Range(0.5f, 1f) * hexRadius;
+                    newHex.transform.localScale = hexScaleVector;
+                    newHex.transform.parent = sections[i].transform;
+                }
+            }
+        }
+
+        //Rotate sections
+        for(int i = 0; i < 6; i++)
+        {
+            sections[i].transform.rotation = Quaternion.Euler(0f, 0f, i * 60f);
+        }
+    }
+
+    private void GenerateQuadsTrisTerrain(GameObject playerTerrain, List<Vector3> playerTerrainVertices, int terrainIndex)
     {
         Vector3 tilePosition;
         float tileDepth;
@@ -279,7 +352,7 @@ public class GameData : MonoBehaviour {
         return playerTerrainVertices;
     }
 
-    private IEnumerator RegenerateTerrain()
+    private IEnumerator RegenerateTerrain(_TerrainType tType)
     {
         while (playerManagers.Count < 2)
             yield return null;
@@ -301,8 +374,11 @@ public class GameData : MonoBehaviour {
 
         AssignColorToTerrainTiles();
 
-        //parse vertices data from input file, scale, and randomize for each player
-        playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
+        if (tType == _TerrainType.QuadsTris)
+        {
+            //parse vertices data from input file, scale, and randomize for each player
+            playerTerrainVertices = PseudoRandomizeVertices(parsedTerrainVertices);
+        }
 
         //Generate player one and player two terrains
         for (int i = 0; i < 2; i++)
@@ -314,7 +390,15 @@ public class GameData : MonoBehaviour {
             //Set parent to the SetupManager GameObject and disable it
             playerTerrains[i].transform.parent = transform;
             //Create terrain tiles for the current player
-            GenerateTerrain(playerTerrains[i], playerTerrainVertices[i], i);
+            switch (tType)
+            {
+                case _TerrainType.QuadsTris:
+                    GenerateQuadsTrisTerrain(playerTerrains[i], playerTerrainVertices[i], i);
+                    break;
+                case _TerrainType.Hexagonal:
+                    GenerateHexagonalTerrain(playerTerrains[i], hexTerrainOrder, i);
+                    break;
+            }
             playerTerrains[i].SetActive(false);
         }
     }
