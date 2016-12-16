@@ -11,8 +11,6 @@ public class PlayerControllerPlanetSP : MonoBehaviour {
     public float rollSpeed = 3;
     public Transform childRollTransform;
 
-    public GameObject bombPrefab;
-
     private bool input;
     private bool flyingClockwise = true;
     private bool flyingClockwiseLastFrame = true;
@@ -98,15 +96,6 @@ public class PlayerControllerPlanetSP : MonoBehaviour {
 
         //Update roll rotation
         childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
-    }
-
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            GameObject bomb = (GameObject) Instantiate(bombPrefab, transform.position, new Quaternion());
-            bomb.GetComponent<Rigidbody2D>().velocity = rigidBody2D.velocity;
-        }
     }
 
     void RollCheck()

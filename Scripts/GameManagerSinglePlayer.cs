@@ -7,6 +7,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
 
     public GameObject playerPrefab;
     public GameObject opponentPrefab;
+    public GameObject bombPrefab;
 
     private GameData gameData;
     private GameObject opponent;
@@ -28,6 +29,12 @@ public class GameManagerSinglePlayer : MonoBehaviour {
     
     //PUBLIC METHODS -- Currently called from GUI buttons
     //------------------------------------------------
+    public void Bomb()
+    {
+        GameObject bomb = (GameObject)Instantiate(bombPrefab, player.transform.position, new Quaternion());
+        bomb.GetComponent<Rigidbody2D>().velocity = player.GetComponent<Rigidbody2D>().velocity;
+    }
+
     public void ChangeGameStateSinglePlanetAttack()
     {
         GameStateSetup(_GameState.SinglePlanetAttack);
