@@ -17,7 +17,7 @@ public class LineSegmentController : MonoBehaviour {
     {
         if (other.tag == _Tags.player)
         {
-            Debug.Log("Hit player!");
+           // Debug.Log("Hit player!");
         }
     }
 

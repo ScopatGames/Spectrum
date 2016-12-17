@@ -79,4 +79,20 @@ public class PlayerSetupSP : MonoBehaviour {
         planetCollider.enabled = false;
         spaceCollider.enabled = false;
     }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.tag == _Tags.environment)
+        {
+            DisableAllGraphics();
+            foreach(PlayerManager pm in GameData.playerManagers)
+            {
+                if(pm.playerNumber == playerNumber)
+                {
+                    pm.playerControlSP.DisableAllControl();
+                }
+            }
+
+        }
+    }
 }

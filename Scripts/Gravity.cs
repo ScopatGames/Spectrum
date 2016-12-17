@@ -11,6 +11,6 @@ public class Gravity : MonoBehaviour {
     }
 
 	void FixedUpdate () {
-        rb.AddForce((Vector3.zero - transform.position) * rb.mass*0.1f);
+        rb.AddForce((Vector3.zero - transform.position) * rb.mass);
 	}
 }
