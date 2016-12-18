@@ -41,6 +41,11 @@ public enum _TerrainType
 
 //Constants
 
+public class _Layers
+{
+    public const string environment = "Environment";
+}
+
 public class _Scenes
 {
     public const string sceneMainMenu = "sceneMainMenu";

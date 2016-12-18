@@ -9,9 +9,9 @@ public class PlayerSetupSP : MonoBehaviour {
     public int playerNumber;
     public bool isReady = false;
     public int randomTerrainSeed;
-
-
     public TextAsset colorList;
+    [HideInInspector]
+    public PlayerManager playerManager;
     private Dictionary<string, Color> playerColors;
 
     //Reference gameobjects for space and planet settings
@@ -26,10 +26,17 @@ public class PlayerSetupSP : MonoBehaviour {
 
     void Start()
     {
-        
-
         //get player colors
         playerColors = (new ColorDictionary(colorList)).GetColorDictionary(((_Colors)colorIndex).ToString());
+
+        //get PlayerManager
+        foreach (PlayerManager pm in GameData.playerManagers)
+        {
+            if (pm.playerNumber == playerNumber)
+            {
+                playerManager = pm;
+            }
+        }
 
         //get components
         meshRendererPlanet = playerPlanetTree.GetComponentInChildren<MeshRenderer>();
@@ -84,14 +91,7 @@ public class PlayerSetupSP : MonoBehaviour {
     {
         if (col.gameObject.tag == _Tags.environment)
         {
-            DisableAllGraphics();
-            foreach(PlayerManager pm in GameData.playerManagers)
-            {
-                if(pm.playerNumber == playerNumber)
-                {
-                    pm.playerControlSP.DisableAllControl();
-                }
-            }
+            playerManager.DestroyPlayerSP(false);
 
         }
     }

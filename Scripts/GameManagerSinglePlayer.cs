@@ -90,6 +90,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         {
             GameData.playerTerrains[0].SetActive(false);
             GameData.playerTerrains[1].SetActive(true);
+            gameData.SetupDefenses();
         }
         gameData.dynamicLight.intensity = gameData.planetDynamicLightingIntensity;
         gameData.dynamicLight.transform.rotation = Quaternion.Euler(gameData.planetDynamicLightingRotation);
@@ -108,6 +109,7 @@ public class GameManagerSinglePlayer : MonoBehaviour {
         {
             GameData.playerTerrains[0].SetActive(true);
             GameData.playerTerrains[1].SetActive(false);
+            gameData.SetupDefenses();
         }
         gameData.dynamicLight.intensity = gameData.planetDynamicLightingIntensity;
         gameData.dynamicLight.transform.rotation = Quaternion.Euler(gameData.planetDynamicLightingRotation);

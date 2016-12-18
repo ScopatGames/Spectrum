@@ -20,6 +20,16 @@ public class PlayerManager {
 
     public OpponentController opponentController;
 
+    public void DestroyPlayerSP(bool debris)
+    {
+        playerSetupSP.DisableAllGraphics();
+        playerControlSP.DisableAllControl();
+        if (debris)
+        {
+            // TODO create debris particle system 
+        }
+    }
+
     public void Setup()
     {
         //Get references to the components
@@ -101,7 +111,7 @@ public class PlayerManager {
                 {
                     case 0: //player
                         playerSetupSP.DisableAllGraphics();
-                        playerControlSP.DisableAllControl();
+                        playerControlSP.EnablePlanetDefenseControl();
                         playerCameraSP.EnablePlanetCameraDefender();
                         break;
                     case 1: //computer opponent
