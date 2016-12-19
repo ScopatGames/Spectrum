@@ -134,7 +134,7 @@ public class PlayerManager {
                 {
                     case 0:
                         playerSetup.DisableAllGraphics();
-                        playerControl.DisableAllControl();
+                        playerControl.EnablePlanetDefenseControl();
                         playerCamera.EnablePlanetCameraDefender();
                         break;
                     case 1:
@@ -159,7 +159,7 @@ public class PlayerManager {
                         break;
                     case 1:
                         playerSetup.DisableAllGraphics();
-                        playerControl.DisableAllControl();
+                        playerControl.EnablePlanetDefenseControl();
                         playerCamera.EnablePlanetCameraDefender();
                         break;
                 }

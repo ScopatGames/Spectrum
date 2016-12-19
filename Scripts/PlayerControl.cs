@@ -8,12 +8,14 @@ public class PlayerControl : MonoBehaviour {
 
     private PlayerControllerSpace playerControllerSpace;
     private PlayerControllerPlanet playerControllerPlanet;
+    private PlayerControllerPlanetDefense playerControllerPlanetDefense;
     private PlayerBarrier playerBarrier;
 
     void Awake()
     {
         playerControllerSpace = GetComponent<PlayerControllerSpace>();
         playerControllerPlanet = GetComponent<PlayerControllerPlanet>();
+        playerControllerPlanetDefense = GetComponent<PlayerControllerPlanetDefense>();
         playerBarrier = GetComponent<PlayerBarrier>();
     }
 
@@ -22,6 +24,7 @@ public class PlayerControl : MonoBehaviour {
         playerBarrier.boundaryRadius = spaceBoundaryRadius;
         playerControllerPlanet.enabled = false;
         playerControllerSpace.enabled = true;
+        playerControllerPlanetDefense.enabled = false;
     }
 
     public void EnablePlanetControl()
@@ -29,11 +32,21 @@ public class PlayerControl : MonoBehaviour {
         playerBarrier.boundaryRadius = planetBoundaryRadius;
         playerControllerSpace.enabled = false;
         playerControllerPlanet.enabled = true;
+        playerControllerPlanetDefense.enabled = false;
+    }
+
+    public void EnablePlanetDefenseControl()
+    {
+        playerBarrier.enabled = false;
+        playerControllerSpace.enabled = false;
+        playerControllerPlanet.enabled = false;
+        playerControllerPlanetDefense.enabled = true;
     }
 
     public void DisableAllControl()
     {
         playerControllerSpace.enabled = false;
         playerControllerPlanet.enabled = false;
+        playerControllerPlanetDefense.enabled = false;
     }
 }

@@ -56,7 +56,7 @@ public class PlayerCamera : NetworkBehaviour {
         {
             smoothCameraSpace.enabled = false;
             smoothCameraPlanet.enabled = true;
-            smoothCameraPlanet.target = otherPlayerTransform;
+            smoothCameraPlanet.target = transform;
         }
     }
 
