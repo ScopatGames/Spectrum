@@ -33,14 +33,18 @@ public class LineSegmentController : MonoBehaviour {
 
     public void SetColors(Color startColor, Color endColor)
     {
-        lineRenderer01.SetColors(startColor, endColor);
-        lineRenderer02.SetColors(startColor, endColor);
+        lineRenderer01.startColor = startColor;
+        lineRenderer01.endColor = endColor;
+        lineRenderer02.startColor = startColor;
+        lineRenderer02.endColor = endColor;
     }
 
     public void SetWidths(float startWidth, float endWidth)
     {
-        lineRenderer01.SetWidth(startWidth, endWidth);
-        lineRenderer02.SetWidth(startWidth, endWidth);
+        lineRenderer01.startWidth = startWidth;
+        lineRenderer01.endWidth = endWidth;
+        lineRenderer02.startWidth = startWidth;
+        lineRenderer02.endWidth = endWidth;
     }
 
 }

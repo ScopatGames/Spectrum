@@ -134,6 +134,8 @@ public class PlayerManager {
                 {
                     case 0:
                         playerSetup.DisableAllGraphics();
+                        instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
                         playerControl.EnablePlanetDefenseControl();
                         playerCamera.EnablePlanetCameraDefender();
                         break;
@@ -159,6 +161,8 @@ public class PlayerManager {
                         break;
                     case 1:
                         playerSetup.DisableAllGraphics();
+                        instance.transform.position = GameData.instance.planetSpawnPoints[0].position;
+                        instance.transform.rotation = Quaternion.Euler(Vector3.zero);
                         playerControl.EnablePlanetDefenseControl();
                         playerCamera.EnablePlanetCameraDefender();
                         break;
