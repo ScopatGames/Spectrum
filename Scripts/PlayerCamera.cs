@@ -8,7 +8,6 @@ public class PlayerCamera : NetworkBehaviour {
 
     private SmoothCameraPlanet smoothCameraPlanet;
     private SmoothCameraSpace smoothCameraSpace;
-    private Transform otherPlayerTransform;
 
     void Start() {
         if (isLocalPlayer)
@@ -60,16 +59,4 @@ public class PlayerCamera : NetworkBehaviour {
         }
     }
 
-    private IEnumerator GetOtherPlayerTransform()
-    {
-        while (GameData.playerManagers.Count < 2)
-            yield return null;
-
-        foreach(PlayerManager pm in GameData.playerManagers)
-        {
-            if (pm.playerCamera != this) {
-                otherPlayerTransform = pm.playerCamera.transform;
-            }
-        }
-    }
 }

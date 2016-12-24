@@ -6,14 +6,16 @@ public class Pool : MonoBehaviour {
 
     public GameObject poolObjectPrefab;
 
-    public List<GameObject> pool = new List<GameObject>();
+    List<GameObject> pool = new List<GameObject>();
+    Vector3 poolPosition = new Vector3(1000f, 0f, 0f);
+    int count = 0;
 
     public void CheckIn(GameObject item)
     {
-        item.transform.parent = transform;
-        item.transform.position = transform.position;
+        item.transform.position = poolPosition;
         item.transform.rotation = Quaternion.identity;
         pool.Add(item);
+        count++;
     }
 
     public GameObject CheckOut()
@@ -22,6 +24,7 @@ public class Pool : MonoBehaviour {
         {
             GameObject item = pool[0];
             pool.RemoveAt(0);
+            count--;
             return item;
         }
         else
@@ -32,16 +35,28 @@ public class Pool : MonoBehaviour {
 
     public int CheckInventory()
     {
-        return pool.Count;
+        return count;
     }
 
     public void InstantiatePoolObjects(int quantity)
     {
         for(int i=0; i < quantity; i++)
         {
-            GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab, transform.position, Quaternion.identity);
+            GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab, poolPosition, Quaternion.identity);
+            tempGameObject.GetComponent<PoolItem>().pool = this;
             tempGameObject.transform.parent = transform;
             pool.Add(tempGameObject);
+            count++;
+        }
+    }
+
+    public void DestroyPoolObjects(int quantity)
+    {
+        for(int i = 0; i < quantity; i++)
+        {
+            GameObject temp = pool[0];
+            pool.RemoveAt(0);
+            Destroy(temp);
         }
     }
 }

@@ -143,7 +143,7 @@ public class GameData : MonoBehaviour {
                 RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.zero - origin, 60f, LayerMask.GetMask(_Layers.environment));
                 temp.transform.position = hit.point;
                 temp.transform.parent = hit.transform;
-                temp.GetComponent<DefenseController>().Initialize();
+                //temp.GetComponent<ItemController>().Initialize();
 
             }
         }
