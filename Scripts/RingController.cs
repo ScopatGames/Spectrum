@@ -121,14 +121,14 @@ public class RingController : MonoBehaviour {
 
     public void ReleaseRing(GameObject ring)
     {
-        ringPool.CheckIn(ring);
+        ringPool.CheckIn(ring.GetComponent<PoolItem>());
     }
 
     public void RetrieveRing()
     {
         if (ringPool.CheckInventory() > 0)
         {
-            tempRing = ringPool.CheckOut();
+            tempRing = ringPool.CheckOut().gameObject;
             tempRing.transform.parent = transform;
             tempRing.transform.position = transform.position;
             tempRing.transform.rotation = Quaternion.identity;

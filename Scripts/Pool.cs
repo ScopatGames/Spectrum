@@ -1,30 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
-public class Pool : MonoBehaviour {
+public class Pool : NetworkBehaviour {
 
-    public GameObject poolObjectPrefab;
+    public PoolItem poolObjectPrefab;
 
-    List<GameObject> pool = new List<GameObject>();
+    List<PoolItem> pool = new List<PoolItem>();
     Vector3 poolPosition = new Vector3(1000f, 0f, 0f);
-    int count = 0;
 
-    public void CheckIn(GameObject item)
+    public void InitializePool(PoolItem item)
+    {
+        poolObjectPrefab = item;
+    }
+
+    public void CheckIn(PoolItem item)
     {
         item.transform.position = poolPosition;
         item.transform.rotation = Quaternion.identity;
         pool.Add(item);
-        count++;
     }
 
-    public GameObject CheckOut()
+    public PoolItem CheckOut()
     {
         if(pool.Count > 0)
         {
-            GameObject item = pool[0];
+            PoolItem item = pool[0];
             pool.RemoveAt(0);
-            count--;
             return item;
         }
         else
@@ -35,18 +38,30 @@ public class Pool : MonoBehaviour {
 
     public int CheckInventory()
     {
-        return count;
+        return pool.Count;
     }
 
     public void InstantiatePoolObjects(int quantity)
     {
         for(int i=0; i < quantity; i++)
         {
-            GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab, poolPosition, Quaternion.identity);
-            tempGameObject.GetComponent<PoolItem>().pool = this;
-            tempGameObject.transform.parent = transform;
-            pool.Add(tempGameObject);
-            count++;
+            GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab.gameObject);
+            PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
+            tempPoolItemRef.pool = this;
+            CheckIn(tempPoolItemRef);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSpawnPoolObjects(int quantity)
+    {
+        for (int i = 0; i < quantity; i++)
+        {
+            GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab.gameObject);
+            NetworkServer.Spawn(tempGameObject);
+            PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
+            tempPoolItemRef.pool = this;
+            CheckIn(tempPoolItemRef);
         }
     }
 
@@ -54,9 +69,9 @@ public class Pool : MonoBehaviour {
     {
         for(int i = 0; i < quantity; i++)
         {
-            GameObject temp = pool[0];
+            PoolItem temp = pool[0];
             pool.RemoveAt(0);
-            Destroy(temp);
+            Destroy(temp.gameObject);
         }
     }
 }

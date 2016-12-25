@@ -75,7 +75,7 @@ public class LineSegmentRing : MonoBehaviour {
             {
                 if (Random.Range(0, 10) < 2 || i == 0)
                 {
-                    tempLineSegment = segmentPool.CheckOut();
+                    tempLineSegment = segmentPool.CheckOut().gameObject;
                     tempLineSegment.transform.parent = transform;
                     tempLineSegment.transform.position = transform.position;
                     tempLineSegment.transform.rotation = Quaternion.identity;
@@ -123,7 +123,7 @@ public class LineSegmentRing : MonoBehaviour {
     {
         foreach(GameObject go in lineSegments)
         {
-            lineSegmentPool.CheckIn(go);
+            lineSegmentPool.CheckIn(go.GetComponent<PoolItem>());
         }
         lineSegments.Clear();
     }

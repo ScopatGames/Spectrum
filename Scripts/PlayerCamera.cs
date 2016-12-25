@@ -19,7 +19,6 @@ public class PlayerCamera : NetworkBehaviour {
             mainCamera.transform.parent = null;
             mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -200f);
             mainCamera.transform.rotation = Quaternion.Euler(Vector3.zero);
-            StartCoroutine("GetOtherPlayerTransform");
         }
         else
         {

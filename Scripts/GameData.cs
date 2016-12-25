@@ -26,13 +26,6 @@ public class GameData : MonoBehaviour {
     private List<Vector3> parsedTerrainVertices;
     private List<Vector3>[] playerTerrainVertices;
 
-    [Header("------ Terrain Defense Data ------")]
-    public int defenseNumber;
-    public GameObject defensePrefab;
-
-    private Pool defensePool;
-    private List<GameObject> defenseList = new List<GameObject>();
-
     [Header("------ Player Data ------")]
     public TextAsset colorListTextAsset;
 
@@ -111,42 +104,7 @@ public class GameData : MonoBehaviour {
         parsedTerrainFaces = ParseFaces(textInputFaces);
         parsedTerrainVertices = ParseVertices(textInputVertices);
 
-        //Create and pool terrain defenses
-        GameObject temp = new GameObject("Defense Pool");
-        temp.transform.parent = transform;
-        temp.transform.position = new Vector3(1000f, 0f, 0f);
-        defensePool = temp.AddComponent<Pool>();
-        defensePool.poolObjectPrefab = defensePrefab;
-        defensePool.InstantiatePoolObjects(defenseNumber);
-
         StartCoroutine("RegenerateTerrain", terrainType);
-    }
-
-    public void SetupDefenses()
-    {
-        // recall defenses
-        foreach(GameObject d in defenseList)
-        {
-            defensePool.CheckIn(d);
-        }
-        defenseList.Clear();
-
-        float angleIncrement = Mathf.PI * 2 / defenseNumber;
-        for (int i = 0; i < defenseNumber; i++)
-        {
-            if (defensePool.CheckInventory() > 0)
-            {
-                GameObject temp = defensePool.CheckOut();
-                defenseList.Add(temp);
-                float angleVariance = Random.Range(-0.1f, 0.1f);
-                Vector2 origin = new Vector2(40f * Mathf.Cos(i*angleIncrement + angleVariance), 40f * Mathf.Sin(i*angleIncrement + angleVariance));
-                RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.zero - origin, 60f, LayerMask.GetMask(_Layers.environment));
-                temp.transform.position = hit.point;
-                temp.transform.parent = hit.transform;
-                //temp.GetComponent<ItemController>().Initialize();
-
-            }
-        }
     }
 
     //PRIVATE METHODS
