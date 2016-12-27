@@ -21,6 +21,8 @@ public class GameData : MonoBehaviour {
 
     [HideInInspector]
     static public List<GameObject> playerTerrains = new List<GameObject>();
+    [HideInInspector]
+    public List<GameObject> terrainTileList = new List<GameObject>();
 
     private List<Vector4> parsedTerrainFaces;
     private List<Vector3> parsedTerrainVertices;
@@ -55,7 +57,14 @@ public class GameData : MonoBehaviour {
     void Awake()
     {
         //Singleton
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
 
         switch (terrainType)
         {
@@ -235,6 +244,9 @@ public class GameData : MonoBehaviour {
             //Instantiate tile prefab
             GameObject newTile = (GameObject)Instantiate(terrainTilePrefab[terrainIndex], tilePosition, Quaternion.identity);
             newTile.transform.parent = playerTerrain.transform;
+            newTile.GetComponent<TerrainTileInfo>().tileIndex = terrainTileList.Count;
+            terrainTileList.Add(newTile);
+
             //Create mesh
             GenerateTile(newTile, newVertices, tileDepth);
         }

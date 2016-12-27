@@ -17,6 +17,7 @@ public class Pool : NetworkBehaviour {
 
     public void CheckIn(PoolItem item)
     {
+        item.Terminate();
         item.transform.position = poolPosition;
         item.transform.rotation = Quaternion.identity;
         pool.Add(item);
@@ -46,6 +47,7 @@ public class Pool : NetworkBehaviour {
         for(int i=0; i < quantity; i++)
         {
             GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab.gameObject);
+            tempGameObject.transform.parent = transform;
             PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
             tempPoolItemRef.pool = this;
             CheckIn(tempPoolItemRef);
@@ -58,6 +60,7 @@ public class Pool : NetworkBehaviour {
         for (int i = 0; i < quantity; i++)
         {
             GameObject tempGameObject = (GameObject)Instantiate(poolObjectPrefab.gameObject);
+            tempGameObject.transform.parent = transform;
             NetworkServer.Spawn(tempGameObject);
             PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
             tempPoolItemRef.pool = this;

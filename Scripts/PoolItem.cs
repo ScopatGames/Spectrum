@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PoolItem : MonoBehaviour {
-
+    [HideInInspector]
     public Pool pool;
 
     public virtual void Initialize()

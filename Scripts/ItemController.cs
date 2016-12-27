@@ -7,15 +7,21 @@ public class ItemController : NetworkBehaviour {
     [Header("Item Prefabs by Deployment Method (increasing capability)")]
     public List<PoolItem> groundDefenses = new List<PoolItem>();
     public List<PoolItem> neutralPickups = new List<PoolItem>();
+    public List<PoolItem> bombDrops = new List<PoolItem>();
 
-    private List<Pool> groundDefensesPools = new List<Pool>();
-    private List<Pool> neutralPickupsPools = new List<Pool>();
-    private List<PoolItem> deployedItems = new List<PoolItem>();
+    public List<Pool> groundDefensesPools = new List<Pool>();
+    public List<Pool> neutralPickupsPools = new List<Pool>();
+    public List<Pool> bombDropsPools = new List<Pool>();
+    public List<PoolItem> deployedItems = new List<PoolItem>();
 
     void Awake()
     {
-        CreatePools(groundDefenses, groundDefensesPools);
-        CreatePools(neutralPickups, neutralPickupsPools);
+        PoolSetup();
+    }
+
+    void Start()
+    {
+        PoolItemSetup();
     }
 
     //PUBLIC METHODS
@@ -26,7 +32,26 @@ public class ItemController : NetworkBehaviour {
         CreatePoolItems(poolRef, quantity);
 
         GroundEvenDistribution(poolRef, quantity);
+    }
 
+    public void DeployNeutralPickups(int level, int quantity)
+    {
+        Pool poolRef = neutralPickupsPools[level];
+        CreatePoolItems(poolRef, quantity);
+
+        SpaceEvenDistribution(poolRef, quantity);
+    }
+
+    public void WithdrawDeployedItems()
+    {
+        if (deployedItems.Count > 0)
+        {
+            foreach (PoolItem poolItem in deployedItems)
+            {
+                poolItem.pool.CheckIn(poolItem);
+            }
+            deployedItems.Clear();
+        }
     }
 
     //PRIVATE METHODS
@@ -57,10 +82,7 @@ public class ItemController : NetworkBehaviour {
         }
     }
 
-    private void DeployNeutralPickups(int level, int quantity)
-    {
-        CreatePoolItems(neutralPickupsPools[level], quantity);
-    }
+    
 
 
     private void GroundEvenDistribution(Pool poolRef, int quantity)
@@ -77,6 +99,39 @@ public class ItemController : NetworkBehaviour {
                 RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.zero - origin, 60f, LayerMask.GetMask(_Layers.environment));
                 temp.transform.position = hit.point;
                 temp.transform.parent = hit.transform;
+                temp.Initialize();
+            }
+        }
+    }
+
+    private void PoolSetup()
+    {
+        CreatePools(groundDefenses, groundDefensesPools);
+        CreatePools(neutralPickups, neutralPickupsPools);
+        CreatePools(bombDrops, bombDropsPools);
+        
+    }
+
+    private void PoolItemSetup()
+    {
+        CreatePoolItems(bombDropsPools[0], 1);
+        CreatePoolItems(neutralPickupsPools[0], 9);
+    }
+
+    private void SpaceEvenDistribution(Pool poolRef, int quantity)
+    {
+        float angleIncrement = Mathf.PI * 2 / quantity;
+        for (int i = 0; i < quantity; i++)
+        {
+            if (poolRef.CheckInventory() > 0)
+            {
+                PoolItem temp = poolRef.CheckOut();
+                deployedItems.Add(temp);
+                float angleVariance = Random.Range(-0.1f, 0.1f);
+                Vector2 origin = new Vector2(22f * Mathf.Cos(i * angleIncrement + angleVariance), 22f * Mathf.Sin(i * angleIncrement + angleVariance));
+                float distanceFactor = Random.Range(3f, 22f)/22f;
+                Debug.Log("testing");
+                temp.transform.position = distanceFactor*origin;
                 temp.Initialize();
             }
         }

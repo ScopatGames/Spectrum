@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using System.Collections;
 
-public class GameManagerMultiplayer :NetworkBehaviour {
+public class GameManagerMultiplayer : NetworkBehaviour {
+
+    static public GameManagerMultiplayer instance;
+    [HideInInspector]
+    public ItemController itemController;
 
     private GameData gameData;
     
     void Awake()
     {
+        //Singleton
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         gameData = GetComponent<GameData>();
+        itemController = GetComponent<ItemController>();
     }
     
     void Start()
@@ -25,6 +40,7 @@ public class GameManagerMultiplayer :NetworkBehaviour {
     
     //PUBLIC METHODS -- Currently called from GUI buttons
     //------------------------------------------------
+
     public void ChangeGameStateMultiPlayerOnePlanet()
     {
         RpcGameStateSetup(_GameState.MultiPlayerOnePlanet);
@@ -39,6 +55,14 @@ public class GameManagerMultiplayer :NetworkBehaviour {
     {
         RpcGameStateSetup(_GameState.MultiNeutral);
     }
+
+    [Command]
+    public void CmdDestroyTerrainTile(int tileIndex)
+    {
+        RpcDestroyTerrainTile(tileIndex);
+    }
+
+    
 
     //PRIVATE METHODS
     //--------------------------------------------------------------
@@ -113,6 +137,16 @@ public class GameManagerMultiplayer :NetworkBehaviour {
         yield return null;
 
         GameStateMultiNeutral();
+
+        yield return null;
+
+        itemController.DeployNeutralPickups(0, 9);
+    }
+
+    [ClientRpc]
+    private void RpcDestroyTerrainTile(int tileIndex)
+    {
+        gameData.terrainTileList[tileIndex].GetComponent<TerrainTileInfo>().DestroyTile();
     }
 
     [ClientRpc]

@@ -12,6 +12,8 @@ public class PlayerControllerPlanet : NetworkBehaviour
     public float rollSpeed = 3;
     public Transform childRollTransform;
 
+    public GameObject bombPrefab;
+
     private bool input;
     private bool flyingClockwise = true;
     private bool flyingClockwiseLastFrame = true;
@@ -29,6 +31,21 @@ public class PlayerControllerPlanet : NetworkBehaviour
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
         StartCoroutine("CheckInterval");
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            PoolItem bomb = GameManagerMultiplayer.instance.itemController.bombDropsPools[0].CheckOut();
+            if (bomb)
+            {
+                bomb.transform.position = transform.position;
+                bomb.Initialize();
+                //GameObject bomb = (GameObject)Instantiate(bombPrefab, transform.position, new Quaternion());
+                bomb.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;
+            }
+        }
     }
 
     void FixedUpdate()
