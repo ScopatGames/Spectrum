@@ -130,7 +130,6 @@ public class ItemController : NetworkBehaviour {
                 float angleVariance = Random.Range(-0.1f, 0.1f);
                 Vector2 origin = new Vector2(22f * Mathf.Cos(i * angleIncrement + angleVariance), 22f * Mathf.Sin(i * angleIncrement + angleVariance));
                 float distanceFactor = Random.Range(3f, 22f)/22f;
-                Debug.Log("testing");
                 temp.transform.position = distanceFactor*origin;
                 temp.Initialize();
             }
