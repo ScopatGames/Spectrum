@@ -10,6 +10,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     public ItemController itemController;
 
     private GameData gameData;
+    public bool opponentIsReady = false;
     
     void Awake()
     {
@@ -34,6 +35,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
         
         if (isServer)
         {
+            StartCoroutine("InitiateItems");
             StartCoroutine("GameLoop");
         }
     }
@@ -55,17 +57,22 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     {
         RpcGameStateSetup(_GameState.MultiNeutral);
     }
-
+    
     [Command]
     public void CmdDestroyTerrainTile(int tileIndex)
     {
         RpcDestroyTerrainTile(tileIndex);
     }
 
-    
-
     //PRIVATE METHODS
     //--------------------------------------------------------------
+    [Command]
+    private void CmdClientCheckin()
+    {
+        Debug.Log("Inside Command!");
+        opponentIsReady = true;
+    }
+
     private IEnumerator GameLoop()
     {
         while(GameData.playerManagers.Count < 2)
@@ -138,8 +145,21 @@ public class GameManagerMultiplayer : NetworkBehaviour {
 
         GameStateMultiNeutral();
 
-        yield return null;
+        if (!isServer)
+        {
+            Debug.Log("Inside initialize");
+            CmdClientCheckin();
+        }
+    }
 
+    private IEnumerator InitiateItems()
+    {
+        while (!opponentIsReady)
+        {
+            Debug.LogError("Opponent not ready.  Waiting...");
+            yield return null;
+        }
+        itemController.DeployBombDrops(0, 1);
         itemController.DeployNeutralPickups(0, 9);
     }
 

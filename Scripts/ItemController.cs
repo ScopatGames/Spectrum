@@ -19,13 +19,14 @@ public class ItemController : NetworkBehaviour {
         PoolSetup();
     }
 
-    void Start()
-    {
-        PoolItemSetup();
-    }
-
     //PUBLIC METHODS
     //--------------------------------------------------------
+    public void DeployBombDrops(int level, int quantity)
+    {
+        Pool poolRef = bombDropsPools[level];
+        CreatePoolItems(poolRef, quantity);
+    }
+
     public void DeployGroundDefenses(int level, int quantity)
     {
         Pool poolRef = groundDefensesPools[level];
@@ -42,6 +43,8 @@ public class ItemController : NetworkBehaviour {
         SpaceEvenDistribution(poolRef, quantity);
     }
 
+    
+
     public void WithdrawDeployedItems()
     {
         if (deployedItems.Count > 0)
@@ -56,6 +59,7 @@ public class ItemController : NetworkBehaviour {
 
     //PRIVATE METHODS
     //--------------------------------------------------------
+
     private void CreatePools(List<PoolItem> inputList, List<Pool> outputList)
     {
         foreach (PoolItem prefab in inputList)
@@ -67,7 +71,7 @@ public class ItemController : NetworkBehaviour {
         }
     }
 
-    private void CreatePoolItems(Pool pool, int quantity)
+    public void CreatePoolItems(Pool pool, int quantity)
     {
         if (pool.CheckInventory() < quantity)
         {
@@ -81,9 +85,6 @@ public class ItemController : NetworkBehaviour {
             }
         }
     }
-
-    
-
 
     private void GroundEvenDistribution(Pool poolRef, int quantity)
     {
@@ -110,12 +111,6 @@ public class ItemController : NetworkBehaviour {
         CreatePools(neutralPickups, neutralPickupsPools);
         CreatePools(bombDrops, bombDropsPools);
         
-    }
-
-    private void PoolItemSetup()
-    {
-        CreatePoolItems(bombDropsPools[0], 1);
-        CreatePoolItems(neutralPickupsPools[0], 9);
     }
 
     private void SpaceEvenDistribution(Pool poolRef, int quantity)
