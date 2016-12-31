@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PoolItem : MonoBehaviour {
+public abstract class PoolItem : MonoBehaviour {
     [HideInInspector]
     public Pool pool;
 
-    public virtual void Initialize()
-    {
+    public abstract void Initialize();
 
-    }
-
-    public virtual void Terminate()
-    {
-
-    }
+    public abstract void Terminate();
 	
 }

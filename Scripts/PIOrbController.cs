@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PIOrbController : PoolItem {
-
     private Spin spin;
     private MeshRenderer meshRenderer;
     private CircleCollider2D circleCollider2D;

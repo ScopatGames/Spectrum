@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.Networking;
 
 public class PIBombController : PoolItem {
-
     public float blastRadius;
     private bool hitSomething;
     private MeshRenderer meshRenderer;

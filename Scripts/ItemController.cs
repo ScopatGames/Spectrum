@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class ItemController : NetworkBehaviour {
+public class ItemController : MonoBehaviour {
     [Header("Item Prefabs by Deployment Method (increasing capability)")]
     public List<PoolItem> groundDefenses = new List<PoolItem>();
     public List<PoolItem> neutralPickups = new List<PoolItem>();
@@ -77,7 +77,7 @@ public class ItemController : NetworkBehaviour {
         {
             if (pool.poolObjectPrefab.GetComponent<NetworkIdentity>())
             {
-                pool.RpcSpawnPoolObjects(quantity - pool.CheckInventory());
+               pool.RpcSpawnPoolObjects(quantity - pool.CheckInventory());
             }
             else
             {

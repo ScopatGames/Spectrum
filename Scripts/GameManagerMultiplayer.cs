@@ -161,6 +161,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
         }
         itemController.DeployBombDrops(0, 1);
         itemController.DeployNeutralPickups(0, 9);
+
     }
 
     [ClientRpc]
