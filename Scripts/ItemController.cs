@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class ItemController : MonoBehaviour {
+public class ItemController : NetworkBehaviour {
     [Header("Item Prefabs by Deployment Method (increasing capability)")]
     public List<PoolItem> groundDefenses = new List<PoolItem>();
     public List<PoolItem> neutralPickups = new List<PoolItem>();
@@ -13,11 +13,6 @@ public class ItemController : MonoBehaviour {
     public List<Pool> neutralPickupsPools = new List<Pool>();
     public List<Pool> bombDropsPools = new List<Pool>();
     public List<PoolItem> deployedItems = new List<PoolItem>();
-
-    void Awake()
-    {
-        PoolSetup();
-    }
 
     //PUBLIC METHODS
     //--------------------------------------------------------
@@ -43,7 +38,12 @@ public class ItemController : MonoBehaviour {
         SpaceEvenDistribution(poolRef, quantity);
     }
 
-    
+    public void PoolSetup()
+    {
+        CreatePools(groundDefenses, groundDefensesPools);
+        CreatePools(neutralPickups, neutralPickupsPools);
+        CreatePools(bombDrops, bombDropsPools);
+    }
 
     public void WithdrawDeployedItems()
     {
@@ -103,14 +103,6 @@ public class ItemController : MonoBehaviour {
                 temp.Initialize();
             }
         }
-    }
-
-    private void PoolSetup()
-    {
-        CreatePools(groundDefenses, groundDefensesPools);
-        CreatePools(neutralPickups, neutralPickupsPools);
-        CreatePools(bombDrops, bombDropsPools);
-        
     }
 
     private void SpaceEvenDistribution(Pool poolRef, int quantity)

@@ -24,7 +24,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
             Destroy(gameObject);
         }
 
-        gameData = GetComponent<GameData>();
+        gameData = GameData.instance;
         itemController = GetComponent<ItemController>();
     }
     
@@ -69,7 +69,6 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     [Command]
     private void CmdClientCheckin()
     {
-        Debug.Log("Inside Command!");
         opponentIsReady = true;
     }
 
@@ -147,20 +146,21 @@ public class GameManagerMultiplayer : NetworkBehaviour {
 
         if (!isServer)
         {
-            Debug.Log("Inside initialize");
             CmdClientCheckin();
         }
     }
 
     private IEnumerator InitiateItems()
     {
-        while (!opponentIsReady)
+        /*while (!opponentIsReady)
         {
-            Debug.LogError("Opponent not ready.  Waiting...");
             yield return null;
-        }
+        }*/
+        itemController.PoolSetup();
         itemController.DeployBombDrops(0, 1);
         itemController.DeployNeutralPickups(0, 9);
+
+        return null;
 
     }
 
