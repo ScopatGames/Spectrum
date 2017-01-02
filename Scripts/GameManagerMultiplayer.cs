@@ -10,6 +10,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     public ItemController itemController;
 
     private GameData gameData;
+    [SyncVar]
     public bool opponentIsReady = false;
     
     void Awake()
@@ -66,11 +67,11 @@ public class GameManagerMultiplayer : NetworkBehaviour {
 
     //PRIVATE METHODS
     //--------------------------------------------------------------
-    [Command]
+    /*[Command]
     private void CmdClientCheckin()
     {
         opponentIsReady = true;
-    }
+    }*/
 
     private IEnumerator GameLoop()
     {
@@ -144,24 +145,16 @@ public class GameManagerMultiplayer : NetworkBehaviour {
 
         GameStateMultiNeutral();
 
-        if (!isServer)
-        {
-            CmdClientCheckin();
-        }
+        
     }
 
     private IEnumerator InitiateItems()
     {
-        /*while (!opponentIsReady)
-        {
-            yield return null;
-        }*/
+        yield return new WaitForSeconds(0.1f);
         itemController.PoolSetup();
+        yield return new WaitForSeconds(0.1f);
         itemController.DeployBombDrops(0, 1);
         itemController.DeployNeutralPickups(0, 9);
-
-        return null;
-
     }
 
     [ClientRpc]

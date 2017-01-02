@@ -6,6 +6,7 @@ public class PlayerLobbyHook : LobbyHook {
 
 	public override void OnLobbyServerSceneLoadedForPlayer(NetworkManager manager, GameObject lobbyPlayer, GameObject gamePlayer)
     {
+        Debug.Log("OnLobbyServerSceneLoadedForPlayer");
         if (lobbyPlayer == null)
             return;
         LobbyPlayer lp = lobbyPlayer.GetComponent<LobbyPlayer>();

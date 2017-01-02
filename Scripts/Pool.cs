@@ -10,11 +10,6 @@ public class Pool : NetworkBehaviour {
     List<PoolItem> pool = new List<PoolItem>();
     Vector3 poolPosition = new Vector3(1000f, 0f, 0f);
 
-    public void InitializePool(PoolItem item)
-    {
-        poolObjectPrefab = item;
-    }
-
     public void CheckIn(PoolItem item)
     {
         item.Terminate();

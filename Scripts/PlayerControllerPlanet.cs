@@ -35,7 +35,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        /*if (Input.GetMouseButtonDown(0))
         {
             PoolItem bomb = GameManagerMultiplayer.instance.itemController.bombDropsPools[0].CheckOut();
             if (bomb)
@@ -45,7 +45,7 @@ public class PlayerControllerPlanet : NetworkBehaviour
                 //GameObject bomb = (GameObject)Instantiate(bombPrefab, transform.position, new Quaternion());
                 bomb.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;
             }
-        }
+        }*/
     }
 
     void FixedUpdate()

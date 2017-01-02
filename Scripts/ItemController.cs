@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 
 public class ItemController : NetworkBehaviour {
-    [Header("Item Prefabs by Deployment Method (increasing capability)")]
-    public List<PoolItem> groundDefenses = new List<PoolItem>();
-    public List<PoolItem> neutralPickups = new List<PoolItem>();
-    public List<PoolItem> bombDrops = new List<PoolItem>();
+    [Header("Pool Prefabs by Deployment Method (increasing capability)")]
+
+    public List<Pool> groundDefensesPoolsPrefabs = new List<Pool>();
+    public List<Pool> neutralPickupsPoolsPrefabs = new List<Pool>();
+    public List<Pool> bombDropsPoolsPrefabs = new List<Pool>();
 
     public List<Pool> groundDefensesPools = new List<Pool>();
     public List<Pool> neutralPickupsPools = new List<Pool>();
@@ -40,9 +41,9 @@ public class ItemController : NetworkBehaviour {
 
     public void PoolSetup()
     {
-        CreatePools(groundDefenses, groundDefensesPools);
-        CreatePools(neutralPickups, neutralPickupsPools);
-        CreatePools(bombDrops, bombDropsPools);
+        CreatePools(groundDefensesPoolsPrefabs, groundDefensesPools);
+        CreatePools(neutralPickupsPoolsPrefabs, neutralPickupsPools);
+        CreatePools(bombDropsPoolsPrefabs, bombDropsPools);
     }
 
     public void WithdrawDeployedItems()
@@ -60,14 +61,13 @@ public class ItemController : NetworkBehaviour {
     //PRIVATE METHODS
     //--------------------------------------------------------
 
-    private void CreatePools(List<PoolItem> inputList, List<Pool> outputList)
+    private void CreatePools(List<Pool> poolPrefabs, List<Pool> pools)
     {
-        foreach (PoolItem prefab in inputList)
+        foreach (Pool prefab in poolPrefabs)
         {
-            GameObject newPool = new GameObject("Pool ("+prefab.gameObject.name + ")");
-            Pool poolComponent = newPool.AddComponent<Pool>();
-            poolComponent.InitializePool(prefab);
-            outputList.Add(poolComponent);
+            GameObject newPool = (GameObject)Instantiate(prefab.gameObject);
+            NetworkServer.Spawn(newPool);
+            pools.Add(newPool.GetComponent<Pool>());
         }
     }
 
@@ -75,13 +75,14 @@ public class ItemController : NetworkBehaviour {
     {
         if (pool.CheckInventory() < quantity)
         {
-            if (pool.poolObjectPrefab.GetComponent<NetworkIdentity>())
+            for (int i = 0; i < quantity; i++)
             {
-               pool.RpcSpawnPoolObjects(quantity - pool.CheckInventory());
-            }
-            else
-            {
-                pool.InstantiatePoolObjects(quantity - pool.CheckInventory());
+                GameObject tempGameObject = (GameObject)Instantiate(pool.poolObjectPrefab.gameObject);
+                tempGameObject.transform.parent = pool.transform;
+                NetworkServer.Spawn(tempGameObject);
+                PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
+                tempPoolItemRef.pool = pool;
+                pool.CheckIn(tempPoolItemRef);
             }
         }
     }
