@@ -10,8 +10,6 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     public ItemController itemController;
 
     private GameData gameData;
-    [SyncVar]
-    public bool opponentIsReady = false;
     
     void Awake()
     {
@@ -43,18 +41,19 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     
     //PUBLIC METHODS -- Currently called from GUI buttons
     //------------------------------------------------
-
-    public void ChangeGameStateMultiPlayerOnePlanet()
+    [Command]
+    public void CmdChangeGameStateMultiPlayerOnePlanet()
     {
         RpcGameStateSetup(_GameState.MultiPlayerOnePlanet);
     }
-
-    public void ChangeGameStateMultiPlayerTwoPlanet()
+    [Command]
+    public void CmdChangeGameStateMultiPlayerTwoPlanet()
     {
         RpcGameStateSetup(_GameState.MultiPlayerTwoPlanet);
     }
 
-    public void ChangeGameStateMultiNeutral()
+    [Command]
+    public void CmdChangeGameStateMultiNeutral()
     {
         RpcGameStateSetup(_GameState.MultiNeutral);
     }
@@ -67,11 +66,6 @@ public class GameManagerMultiplayer : NetworkBehaviour {
 
     //PRIVATE METHODS
     //--------------------------------------------------------------
-    /*[Command]
-    private void CmdClientCheckin()
-    {
-        opponentIsReady = true;
-    }*/
 
     private IEnumerator GameLoop()
     {

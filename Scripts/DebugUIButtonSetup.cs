@@ -6,17 +6,17 @@ public class DebugUIButtonSetup : MonoBehaviour {
 
     public void PlayerOne()
     {
-        GameManagerMultiplayer.instance.ChangeGameStateMultiPlayerOnePlanet();
+        GameManagerMultiplayer.instance.CmdChangeGameStateMultiPlayerOnePlanet();
     }	
 
     public void PlayerTwo()
     {
-        GameManagerMultiplayer.instance.ChangeGameStateMultiPlayerTwoPlanet();
+        GameManagerMultiplayer.instance.CmdChangeGameStateMultiPlayerTwoPlanet();
     }
 
     public void Neutral()
     {
-        GameManagerMultiplayer.instance.ChangeGameStateMultiNeutral();
+        GameManagerMultiplayer.instance.CmdChangeGameStateMultiNeutral();
     }
 	
 }
