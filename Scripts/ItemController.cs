@@ -15,6 +15,10 @@ public class ItemController : NetworkBehaviour {
     public List<Pool> bombDropsPools = new List<Pool>();
     public List<PoolItem> deployedItems = new List<PoolItem>();
 
+    private const float ANGLE_VARIANCE = 0.1f;
+    private const float INNER_RADIUS = 3f;
+    private const float OUTER_RADIUS = 22f;
+
     //PUBLIC METHODS
     //--------------------------------------------------------
     public void DeployBombDrops(int level, int quantity)
@@ -66,24 +70,16 @@ public class ItemController : NetworkBehaviour {
         foreach (Pool prefab in poolPrefabs)
         {
             GameObject newPool = (GameObject)Instantiate(prefab.gameObject);
-            NetworkServer.Spawn(newPool);
             pools.Add(newPool.GetComponent<Pool>());
         }
     }
 
     public void CreatePoolItems(Pool pool, int quantity)
     {
-        if (pool.CheckInventory() < quantity)
+        int neededQty = quantity - pool.CheckInventory();
+        if (neededQty > 0)
         {
-            for (int i = 0; i < quantity; i++)
-            {
-                GameObject tempGameObject = (GameObject)Instantiate(pool.poolObjectPrefab.gameObject);
-                tempGameObject.transform.parent = pool.transform;
-                NetworkServer.Spawn(tempGameObject);
-                PoolItem tempPoolItemRef = tempGameObject.GetComponent<PoolItem>();
-                tempPoolItemRef.pool = pool;
-                pool.CheckIn(tempPoolItemRef);
-            }
+            pool.InstantiatePoolObjects(neededQty);
         }
     }
 
@@ -96,12 +92,12 @@ public class ItemController : NetworkBehaviour {
             {
                 PoolItem temp = poolRef.CheckOut();
                 deployedItems.Add(temp);
-                float angleVariance = Random.Range(-0.1f, 0.1f);
-                Vector2 origin = new Vector2(40f * Mathf.Cos(i * angleIncrement + angleVariance), 40f * Mathf.Sin(i * angleIncrement + angleVariance));
-                RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.zero - origin, 60f, LayerMask.GetMask(_Layers.environment));
+                float angleVariance = Random.Range(-ANGLE_VARIANCE, ANGLE_VARIANCE);
+                Vector2 origin = new Vector2(OUTER_RADIUS * Mathf.Cos(i * angleIncrement + angleVariance), OUTER_RADIUS * Mathf.Sin(i * angleIncrement + angleVariance));
+                RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.zero - origin, OUTER_RADIUS, LayerMask.GetMask(_Layers.environment));
                 temp.transform.position = hit.point;
                 temp.transform.parent = hit.transform;
-                temp.Initialize();
+                temp.RpcInitialize();
             }
         }
     }
@@ -115,11 +111,11 @@ public class ItemController : NetworkBehaviour {
             {
                 PoolItem temp = poolRef.CheckOut();
                 deployedItems.Add(temp);
-                float angleVariance = Random.Range(-0.1f, 0.1f);
-                Vector2 origin = new Vector2(22f * Mathf.Cos(i * angleIncrement + angleVariance), 22f * Mathf.Sin(i * angleIncrement + angleVariance));
-                float distanceFactor = Random.Range(3f, 22f)/22f;
+                float angleVariance = Random.Range(-ANGLE_VARIANCE, ANGLE_VARIANCE);
+                Vector2 origin = new Vector2(OUTER_RADIUS * Mathf.Cos(i * angleIncrement + angleVariance), OUTER_RADIUS * Mathf.Sin(i * angleIncrement + angleVariance));
+                float distanceFactor = Random.Range(INNER_RADIUS, OUTER_RADIUS)/OUTER_RADIUS;
                 temp.transform.position = distanceFactor*origin;
-                temp.Initialize();
+                temp.RpcInitialize();
             }
         }
     }

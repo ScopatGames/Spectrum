@@ -40,6 +40,14 @@ public class PIBombController : PoolItem {
 
         
     }
+
+    [ClientRpc]
+    public override void RpcInitialize()
+    {
+        Initialize();
+
+    }
+
     public override void Initialize()
     {
         meshRenderer.enabled = true;
@@ -49,6 +57,11 @@ public class PIBombController : PoolItem {
         rb.isKinematic = false;
     }
 
+    [ClientRpc]
+    public override void RpcTerminate()
+    {
+        Terminate();
+    }
     public override void Terminate()
     {
         meshRenderer.enabled = false;
