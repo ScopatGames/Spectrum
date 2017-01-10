@@ -21,7 +21,7 @@ public class ItemController : NetworkBehaviour {
 
     //PUBLIC METHODS
     //--------------------------------------------------------
-    public void DeployBombDrops(int level, int quantity)
+    public void PrepareBombDrops(int level, int quantity)
     {
         Pool poolRef = bombDropsPools[level];
         CreatePoolItems(poolRef, quantity);
@@ -31,60 +31,6 @@ public class ItemController : NetworkBehaviour {
     {
         Pool poolRef = groundDefensesPools[level];
         CreatePoolItems(poolRef, quantity);
-
-        GroundEvenDistribution(poolRef, quantity);
-    }
-
-    public void DeployNeutralPickups(int level, int quantity)
-    {
-        Pool poolRef = neutralPickupsPools[level];
-        CreatePoolItems(poolRef, quantity);
-
-        SpaceEvenDistribution(poolRef, quantity);
-    }
-
-    public void PoolSetup()
-    {
-        CreatePools(groundDefensesPoolsPrefabs, groundDefensesPools);
-        CreatePools(neutralPickupsPoolsPrefabs, neutralPickupsPools);
-        CreatePools(bombDropsPoolsPrefabs, bombDropsPools);
-    }
-
-    public void WithdrawDeployedItems()
-    {
-        if (deployedItems.Count > 0)
-        {
-            foreach (PoolItem poolItem in deployedItems)
-            {
-                poolItem.pool.CheckIn(poolItem);
-            }
-            deployedItems.Clear();
-        }
-    }
-
-    //PRIVATE METHODS
-    //--------------------------------------------------------
-
-    private void CreatePools(List<Pool> poolPrefabs, List<Pool> pools)
-    {
-        foreach (Pool prefab in poolPrefabs)
-        {
-            GameObject newPool = (GameObject)Instantiate(prefab.gameObject);
-            pools.Add(newPool.GetComponent<Pool>());
-        }
-    }
-
-    public void CreatePoolItems(Pool pool, int quantity)
-    {
-        int neededQty = quantity - pool.CheckInventory();
-        if (neededQty > 0)
-        {
-            pool.InstantiatePoolObjects(neededQty);
-        }
-    }
-
-    private void GroundEvenDistribution(Pool poolRef, int quantity)
-    {
         float angleIncrement = Mathf.PI * 2 / quantity;
         for (int i = 0; i < quantity; i++)
         {
@@ -102,8 +48,10 @@ public class ItemController : NetworkBehaviour {
         }
     }
 
-    private void SpaceEvenDistribution(Pool poolRef, int quantity)
+    public void DeployNeutralPickups(int level, int quantity)
     {
+        Pool poolRef = neutralPickupsPools[level];
+        CreatePoolItems(poolRef, quantity);
         float angleIncrement = Mathf.PI * 2 / quantity;
         for (int i = 0; i < quantity; i++)
         {
@@ -113,10 +61,51 @@ public class ItemController : NetworkBehaviour {
                 deployedItems.Add(temp);
                 float angleVariance = Random.Range(-ANGLE_VARIANCE, ANGLE_VARIANCE);
                 Vector2 origin = new Vector2(OUTER_RADIUS * Mathf.Cos(i * angleIncrement + angleVariance), OUTER_RADIUS * Mathf.Sin(i * angleIncrement + angleVariance));
-                float distanceFactor = Random.Range(INNER_RADIUS, OUTER_RADIUS)/OUTER_RADIUS;
-                temp.transform.position = distanceFactor*origin;
+                float distanceFactor = Random.Range(INNER_RADIUS, OUTER_RADIUS) / OUTER_RADIUS;
+                temp.transform.position = distanceFactor * origin;
                 temp.RpcInitialize();
             }
+        }
+    }
+
+    public void PoolSetup()
+    {
+        CreatePools(groundDefensesPoolsPrefabs, groundDefensesPools);
+        CreatePools(neutralPickupsPoolsPrefabs, neutralPickupsPools);
+        CreatePools(bombDropsPoolsPrefabs, bombDropsPools);
+    }
+
+    public void WithdrawDeployedItems()
+    {
+        if (deployedItems.Count > 0)
+        {
+            foreach (PoolItem poolItem in deployedItems)
+            {
+                poolItem.pool.CheckIn(poolItem);
+                poolItem.RpcTerminate();
+            }
+            deployedItems.Clear();
+        }
+    }
+
+    //PRIVATE METHODS
+    //--------------------------------------------------------
+
+    private void CreatePools(List<Pool> poolPrefabs, List<Pool> pools)
+    {
+        foreach (Pool prefab in poolPrefabs)
+        {
+            GameObject newPool = (GameObject)Instantiate(prefab.gameObject);
+            pools.Add(newPool.GetComponent<Pool>());
+        }
+    }
+
+    private void CreatePoolItems(Pool pool, int quantity)
+    {
+        int neededQty = quantity - pool.CheckInventory();
+        if (neededQty > 0)
+        {
+            pool.InstantiatePoolObjects(neededQty);
         }
     }
 }

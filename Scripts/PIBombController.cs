@@ -11,15 +11,17 @@ public class PIBombController : PoolItem {
     private Spin spin;
     private Rigidbody2D rb;
 
-    void Awake()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
         meshRenderer = GetComponent<MeshRenderer>();
         circleCollider2D = GetComponent<CircleCollider2D>();
         gravity = GetComponent<Gravity>();
         spin = GetComponent<Spin>();
         rb = GetComponent<Rigidbody2D>();
+        Terminate();
     }
-
+    [ServerCallback]
 	void OnCollisionEnter2D(Collision2D collision2D)
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, blastRadius);
@@ -35,10 +37,18 @@ public class PIBombController : PoolItem {
 
         if (hitSomething)
         {
+            GameManagerMultiplayer.instance.itemController.deployedItems.Remove(this);
             GetComponent<PoolItem>().pool.CheckIn(GetComponent<PoolItem>());
         }
 
         
+    }
+
+    [ClientRpc]
+    public void RpcSetState(Vector3 position, Vector2 velocity)
+    {
+        transform.position = position;
+        rb.velocity = velocity;
     }
 
     [ClientRpc]

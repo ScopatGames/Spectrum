@@ -27,6 +27,15 @@ public class PlayerControllerPlanet : NetworkBehaviour
     private Vector3 directionVector;
     private Rigidbody2D rigidBody2D;
 
+    //Touch
+    float touchStartTime;
+    Vector2 touchStartPos;
+    float touchDuration;
+    Vector2 swipeVector;
+    const float maxSwipeTime = 0.5f;
+    const float minSwipeDistance = 30f;
+
+
     void Awake()
     {
         rigidBody2D = GetComponent<Rigidbody2D>();
@@ -35,17 +44,62 @@ public class PlayerControllerPlanet : NetworkBehaviour
 
     void Update()
     {
-        /*if (Input.GetMouseButtonDown(0))
+        if (!isLocalPlayer)
         {
-            PoolItem bomb = GameManagerMultiplayer.instance.itemController.bombDropsPools[0].CheckOut();
-            if (bomb)
+            return;
+        }
+        //Touch controls
+        foreach (Touch touch in Input.touches)
+        {
+            switch (touch.phase)
             {
-                bomb.transform.position = transform.position;
-                bomb.Initialize();
-                //GameObject bomb = (GameObject)Instantiate(bombPrefab, transform.position, new Quaternion());
-                bomb.GetComponent<Rigidbody2D>().velocity = GetComponent<Rigidbody2D>().velocity;
+                case TouchPhase.Began:
+                    touchStartTime = Time.time;
+                    touchStartPos = touch.position;
+                    break;
+                case TouchPhase.Ended:
+                    touchDuration = Time.time - touchStartTime;
+                    swipeVector = touch.position - touchStartPos;
+                    InteractionEnd();
+                    break;
+                case TouchPhase.Canceled:
+                    break;
+                default:
+                    break;
             }
+        }
+        //Mouse Controls
+        if (Input.GetMouseButtonDown(0))
+        {
+            touchStartTime = Time.time;
+            touchStartPos = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            touchDuration = Time.time - touchStartTime;
+            swipeVector = (Vector2)Input.mousePosition - touchStartPos;
+            InteractionEnd();
+        }
+        /*if (Input.GetMouseButtonDown(0) && isLocalPlayer)
+        {
+            CmdRequestBombDrop();
         }*/
+    }
+
+    private void InteractionEnd()
+    {
+        if (touchDuration < maxSwipeTime && swipeVector.sqrMagnitude > (minSwipeDistance * minSwipeDistance))
+        {
+            //Test if swipe was in the y direction
+            if (Mathf.Abs(swipeVector.y) > Mathf.Abs(swipeVector.x))
+            {
+                if (swipeVector.y < 0)
+                {
+                    CmdRequestBombDrop();
+                }
+            }
+        }
     }
 
     void FixedUpdate()
@@ -117,6 +171,18 @@ public class PlayerControllerPlanet : NetworkBehaviour
 
         //Update roll rotation
         childRollTransform.localRotation = Quaternion.Slerp(childRollTransform.localRotation, childRotationTarget, rollSpeed * Time.deltaTime);
+    }
+
+    [Command]
+    void CmdRequestBombDrop()
+    {
+        PoolItem bomb = GameManagerMultiplayer.instance.itemController.bombDropsPools[0].CheckOut();
+        if (bomb)
+        {
+            bomb.RpcInitialize();
+            bomb.GetComponent<PIBombController>().RpcSetState(transform.position, GetComponent<Rigidbody2D>().velocity);
+            GameManagerMultiplayer.instance.itemController.deployedItems.Add(bomb);
+        }
     }
 
     void RollCheck()

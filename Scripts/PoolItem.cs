@@ -10,12 +10,7 @@ public class PoolItem : NetworkBehaviour {
     public virtual void RpcInitialize() { }
     [ClientRpc]
     public virtual void RpcTerminate() { }
-
-    public virtual void Initialize()
-    {
-        Debug.Log("Network ID: " + GetComponent<NetworkIdentity>().netId + " Initialized");
-    }
-
+    public virtual void Initialize() { }
     public virtual void Terminate() { }
 	
 }

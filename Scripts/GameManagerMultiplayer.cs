@@ -44,17 +44,20 @@ public class GameManagerMultiplayer : NetworkBehaviour {
     [Command]
     public void CmdChangeGameStateMultiPlayerOnePlanet()
     {
+        itemController.WithdrawDeployedItems();
         RpcGameStateSetup(_GameState.MultiPlayerOnePlanet);
     }
     [Command]
     public void CmdChangeGameStateMultiPlayerTwoPlanet()
     {
+        itemController.WithdrawDeployedItems();
         RpcGameStateSetup(_GameState.MultiPlayerTwoPlanet);
     }
 
     [Command]
     public void CmdChangeGameStateMultiNeutral()
     {
+        itemController.WithdrawDeployedItems();
         RpcGameStateSetup(_GameState.MultiNeutral);
     }
     
@@ -147,7 +150,7 @@ public class GameManagerMultiplayer : NetworkBehaviour {
         yield return new WaitForSeconds(0.1f);
         itemController.PoolSetup();
         yield return new WaitForSeconds(0.1f);
-        itemController.DeployBombDrops(0, 1);
+        itemController.PrepareBombDrops(0, 1);
         itemController.DeployNeutralPickups(0, 9);
     }
 

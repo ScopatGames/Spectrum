@@ -8,8 +8,9 @@ public class PIOrbController : PoolItem {
     private MeshRenderer meshRenderer;
     private CircleCollider2D circleCollider2D;
 
-    void Awake()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
         spin = GetComponent<Spin>();
         meshRenderer = GetComponent<MeshRenderer>();
         circleCollider2D = GetComponent<CircleCollider2D>();
@@ -39,6 +40,7 @@ public class PIOrbController : PoolItem {
 
     public override void Terminate()
     {
+        base.Terminate();
         spin.enabled = false;
         meshRenderer.enabled = false;
         circleCollider2D.enabled = false;
